@@ -1,0 +1,20 @@
+# This file generates the GitHub Actions matrix
+# For simple board + shield combinations, add them
+# to the top level board and shield arrays, for more
+# control, add individual board + shield combinations to
+# the `include` property, e.g:
+
+---
+include:
+  - board: nice_nano
+    shield: central_dongle snake_adapter
+    artifact-name: snake_dongle
+  - board: nice_nano
+    shield: sofle_left
+    artifact-name: sofle_left
+  - board: nice_nano
+    shield: sofle_right
+    artifact-name: sofle_right
+  - board: nice_nano
+    shield: settings_reset
+    artifact-name: settings_reset

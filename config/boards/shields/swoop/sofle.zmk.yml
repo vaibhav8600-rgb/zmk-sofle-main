@@ -1,0 +1,16 @@
+file_format: "1"
+id: sofle
+name: Sofle
+url: https://github.com/vaibhav8600-rgb/zmk-sofle-main
+type: shield
+requires: [pro_micro]
+exposes: [i2c_oled]
+features:
+  - keys
+  - display
+outputs:
+  - usb
+  - ble
+siblings:
+  - sofle_left
+  - sofle_right

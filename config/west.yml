@@ -1,0 +1,18 @@
+manifest:
+  defaults:
+    revision: v0.3
+  remotes:
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+    - name: joaopedropio
+      url-base: https://github.com/joaopedropio
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      revision: main
+      import: app/west.yml
+    - name: snake-module
+      remote: joaopedropio
+      revision: zephyr-4.1
+  self:
+    path: config
