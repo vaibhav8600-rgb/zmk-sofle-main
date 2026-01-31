@@ -1,14 +1,58 @@
-# Snake Swoop
+This custom **ZMK Sofle** configuration is a high-performance, dongle-based split keyboard setup. It features a unique **Central Dongle** that offloads processing to a dedicated nice!nano (reducing latency and saving battery on the halves) and integrates a specialized **Snake Game** module with custom animations and audio.
 
-<img src="https://i.imgur.com/b5NPONz.jpeg" width="100%" />
+---
 
-The configuration for my sweet daily driver [swoop](https://github.com/jimmerricks/swoop) keyboard with [snake dongle](https://github.com/joaopedropio/snake-dongle).
+# 🐍 ZMK Sofle "Snake" Edition
 
-[Case](https://github.com/joaopedropio/swoop-case) designed by my wife.
+A highly customized ZMK firmware for the Sofle keyboard, utilizing a **dedicated dongle** (central role) and two wireless peripherals (left/right halves).
 
-## Keymap explanation
+## ✨ Key Features
 
-Heavily inspired by [Miryoku](https://github.com/manna-harbour/miryoku) by *manna-harbour*. Every layer has something similiar to [home row mods](https://precondition.github.io/home-row-mods) but is triggered using combos. Holding ST or NE is like holding control. Holding RS or EI is like holding meta. Holding RT or NI is like holding alt. To change the base layer from Colemak to Qwerty simply press QWRT key on System layer as show on the diagram bellow. To change back to Colemak, press CLMK. This action do not persist between keyboard initializations.
+* **Dongle-Central Architecture:** Processing is handled by a standalone nice!nano dongle to improve battery life on the keyboard halves.
+* **Snake Game Integration:** Includes the `snake-module` for custom display animations and gameplay.
+* **Enhanced Connectivity:** Boosted Bluetooth TX power ( dBm) for a rock-solid wireless link.
+* **Custom OLED Visuals:** Features custom status screens, WPM tracking, and battery level fetching for all connected peripherals.
+* **Rotary Encoder Support:** Fully configured for dual EC11 encoders on the keyboard halves.
 
-## Complete diagram
-<img src="https://raw.githubusercontent.com/joaopedropio/joaopedropio.github.io/old/swoop_layout_diagram.svg" width="100%" ></embed>
+## 🛠 Hardware Configuration
+
+* **Controller:** nice!nano v2.0.0.
+* **Keyboard:** Sofle (Split 60%).
+* **Displays:** SSD1306 OLED (128x32) on halves; ST7789V on Dongle.
+* **Additional Hardware:** Buzzer support for UI sounds.
+
+---
+
+## ⌨️ Default Keymap Layers
+
+| Layer | Function | Key Features |
+| --- | --- | --- |
+| **0: BASE** | Standard Typing | QWERTY, Volume Control (Encoder) 
+
+ |
+| **1: LOWER** | Numbers/Symbols | F-keys, Punctuation, Page Nav (Encoder) 
+
+ |
+| **2: RAISE** | Navigation/BT | Bluetooth profile selection, Arrow keys 
+
+ |
+| **3: ADJUST** | System/RGB | RGB Toggle, Underglow effects, Ext Power 
+
+ |
+
+> 
+> **Note:** The **ADJUST** layer is automatically triggered by holding both **LOWER** and **RAISE** keys simultaneously.
+> 
+> 
+
+---
+
+```
+
+---
+
+## 📝 Customization
+
+* **Keyboard Name:** Set to **"Snake"**.
+* **Sleep:** Deep sleep is enabled to conserve power.
+* **Dongle Settings:** Configured to handle 2 peripherals with a maximum of 5 Bluetooth connections.
