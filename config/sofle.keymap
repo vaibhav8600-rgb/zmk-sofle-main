@@ -10,19 +10,90 @@
 #include <dt-bindings/zmk/rgb.h>
 #include <dt-bindings/zmk/ext_power.h>
 
+/* ===== Mouse sweet-spot defaults (ZMK v0.3) ===== */
+#define ZMK_POINTING_DEFAULT_MOVE_VAL 1200
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 17
+#include <dt-bindings/zmk/mouse.h>
+
 #define BASE 0
 #define LOWER 1
 #define RAISE 2
 #define ADJUST 3
 
 / {
+    // ---------- TAP-DANCE FOR CUSTOM LAYER BEHAVIOR ----------
+    tap_dance_lower: tap_dance_lower {
+        compatible = "zmk,behavior-tap-dance";
+        #binding-cells = <0>;
+        tapping-term-ms = <280>;   // double-tap speed
+        bindings = <&mo LOWER>, <&tog LOWER>;
+    };
 
-   // Activate ADJUST layer by pressing raise and lower
+    tap_dance_raise: tap_dance_raise {
+        compatible = "zmk,behavior-tap-dance";
+        #binding-cells = <0>;
+        tapping-term-ms = <280>;
+        bindings = <&mo RAISE>, <&tog RAISE>;
+    };
+
+    // Activate ADJUST layer when LOWER and RAISE are both active
     conditional_layers {
         compatible = "zmk,conditional-layers";
         adjust_layer {
             if-layers = <LOWER RAISE>;
             then-layer = <ADJUST>;
+        };
+    };
+
+    // J + K + L combo -> Enter (RET) on BASE layer
+    combos {
+        compatible = "zmk,combos";
+
+        combo_jkl_enter {
+            timeout-ms = <65>;          // Time window to press J+K+L together
+            key-positions = <31 32 33>; // J, K, L positions in default_layer
+            layers = <BASE>;            // Only active on BASE (default) layer
+            bindings = <&kp RET>;       // Sends Enter
+        };
+
+        combo_asd_select_all {
+
+            /*
+            * A + S + D (left hand home row)
+            * Extremely safe: no accidental rolls
+            */
+            layers = <BASE>;
+            key-positions = <26 27 28>;  // A, S, D 
+            timeout-ms = <65>;
+            bindings = <&kp LC(A)>;
+        };
+
+    };
+
+    // 🔮 Magic macro: Win+1 → Win+2 → Win+3 → Win+4 → Win+5
+    macros {
+        multi_win_apps: multi_win_apps {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <40>;
+            tap-ms  = <30>;
+            bindings = <
+                &kp LG(N1)
+                &kp LG(N2)
+                &kp LG(N3)
+                &kp LG(N4)
+                &kp LG(N5)
+            >;
+        };
+    };
+
+    behaviors {
+          // THIS FIXES THE ERROR: Define the behavior for the scroll wheel
+        inc_dec_msc: inc_dec_msc {
+            compatible = "zmk,behavior-sensor-rotate-var";
+            #sensor-binding-cells = <2>;
+            bindings = <&msc>, <&msc>;
+            tap-ms = <20>;
         };
     };
 
@@ -32,25 +103,31 @@
         default_layer {
             display-name = "default";
 // ------------------------------------------------------------------------------------------------------------
-// |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |       |
+// |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |  DEL  |
 // |  ESC  |  Q  |  W  |  E   |  R   |  T   |                   |  Y   |  U    |  I    |  O   |   P   | BKSPC |
 // |  TAB  |  A  |  S  |  D   |  F   |  G   |                   |  H   |  J    |  K    |  L   |   ;   |   '   |
-// | SHIFT |  Z  |  X  |  C   |  V   |  B   |  MUTE  |  |       |  N   |  M    |  ,    |  .   |   /   | SHIFT |
+// | SHIFT |  Z  |  X  |  C   |  V   |  B   |  MUTE  |  |      |  N   |  M    |  ,    |  .   |   /   | SHIFT |
 //               | GUI | ALT  | CTRL | LOWER|  ENTER |  | SPACE | RAISE| CTRL  | ALT   | GUI  |
+//
+// Note: On default layer:
+//   - Tap A/X/C/V = a/x/c/v
+//   - Double Tap  = Ctrl+A
+//   - Hold X/C/V  = Ctrl+X / Ctrl+C / Ctrl+V
+//   - Hold X      = Ctrl+Z
+//   - Hold Y      = Ctrl+Y
             bindings = <
-&kp GRAVE &kp N1 &kp N2   &kp N3   &kp N4    &kp N5                           &kp N6 &kp N7    &kp N8    &kp N9   &kp N0   &none
-&kp ESC   &kp Q  &kp W    &kp E    &kp R     &kp T                            &kp Y  &kp U     &kp I     &kp O    &kp P    &kp BSPC
-&kp TAB   &kp A  &kp S    &kp D    &kp F     &kp G                            &kp H  &kp J     &kp K     &kp L    &kp SEMI &kp SQT
-&kp LSHFT &kp Z  &kp X    &kp C    &kp V     &kp B      &kp C_MUTE &none      &kp N  &kp M     &kp COMMA &kp DOT  &kp FSLH &kp RSHFT
-                 &kp LGUI &kp LALT &kp LCTRL &mo LOWER  &kp RET    &kp SPACE  &mo RAISE  &kp RCTRL &kp RALT  &kp RGUI
+&mt CLCK GRAVE &mt LG(N1) N1  &mt LG(N2) N2  &mt LG(N3) N3  &mt LG(N4) N4  &mt LG(N5) N5                                        &kp N6       &kp N7    &kp N8             &kp N9    &kp N0   &kp DEL
+&kp ESC        &kp Q          &kp W          &kp E          &kp R          &kp T                                                &mt LC(Y) Y  &kp U     &kp I              &kp O     &kp P    &kp BSPC
+&kp TAB        &kp A          &kp S          &kp D          &kp F          &kp G                                                &kp H        &kp J     &kp K              &kp L     &kp SEMI &kp SQT
+&kp LSHFT      &mt LC(Z) Z    &mt LC(X) X    &mt LC(C) C    &mt LC(V) V    &kp B      &kp C_MUTE                   &none        &kp N     &mt LC(LS(M)) M    &kp COMMA &kp DOT  &kp FSLH &kp RSHFT
+                              &kp LGUI       &kp LALT       &kp LCTRL      &tap_dance_lower  &kp RET                      &kp SPACE    &tap_dance_raise &kp RCTRL          &kp RALT  &kp RGUI
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
         };
 
         lower_layer {
             display-name = "lower";
-// TODO: Some binds are waiting for shifted keycode support.
 // ------------------------------------------------------------------------------------------------------------
 // |       |  F1 |  F2 |  F3  |  F4  |  F5  |                   |  F6  |  F7   |  F8   |  F9  |  F10  |  F11  |
 // |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |  F12  |
@@ -65,26 +142,26 @@
                     &trans    &trans      &trans    &trans     &trans &trans  &trans    &trans   &trans    &trans
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
         };
 
         raise_layer {
             display-name = "raise";
 // ------------------------------------------------------------------------------------------------------------
 // | BTCLR | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                |      |      |       |      |       |       |
-// |       | INS  | PSCR | GUI   |       |      |                | PGUP |      |   ^   |      |       |       |
-// |       | ALT  | CTRL | SHIFT |       | CAPS |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
-// |       | UNDO | CUT  | COPY  | PASTE |      |      |  |      |      |      |       |      |       |       |
+// |BT_CLR_ALL| INS | PSCR | GUI |       |      |                | PGUP |      |   ^   |      |       |       |
+// |       | ALT  | LCLK |   M↑  |  RCLK | MCLK |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
+// |       | UNDO |  M←  |   M↓  |  M→   |      |      |  |      |      |      |       |      |       |       |
 //                |      |       |       |      |      |  |      |      |      |       |      |
             bindings = <
-&bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                  &trans    &trans    &trans   &trans    &trans  &trans
-&trans     &kp INS      &kp PSCRN    &kp K_CMENU  &trans       &trans                        &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
-&trans     &kp LALT     &kp LCTRL    &kp LSHFT    &trans       &kp CLCK                      &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT &kp DEL &kp BSPC
-&trans     &kp K_UNDO   &kp K_CUT    &kp K_COPY   &kp K_PASTE  &trans        &trans  &trans  &trans    &trans    &trans   &trans    &trans  &trans
+&bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1      &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                       &trans    &trans    &trans   &trans    &trans  &trans
+&bt BT_CLR_ALL     &kp INS      &kp PSCRN         &kp K_CMENU      &trans           &trans                     &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
+&trans     &kp LALT     &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT &kp DEL &kp BSPC
+&trans     &kp K_UNDO   &mmv MOVE_LEFT    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &trans        &trans  &trans  &trans    &multi_win_apps    &trans   &trans    &trans  &trans
                         &trans       &trans       &trans       &trans        &trans  &trans  &trans    &trans    &trans   &trans
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
         };
 
         adjust_layer {
@@ -96,13 +173,31 @@
 //                    |         |         |         |         |         | |      |      |      |       |      |
             display-name = "adjust";
             bindings = <
-&bt BT_CLR        &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4                            &none &none &none &none &none &none
-&ext_power EP_TOG &rgb_ug RGB_HUD &rgb_ug RGB_HUI &rgb_ug RGB_SAD &rgb_ug RGB_SAI &rgb_ug RGB_EFF                         &none &none &none &none &none &none
-&none             &rgb_ug RGB_BRD &rgb_ug RGB_BRI &none           &none           &none                                   &none &none &none &none &none &none
-&none             &none           &none           &none           &none           &none            &rgb_ug RGB_TOG &none  &none &none &none &none &none &none
-                                  &none           &none           &none           &none            &none           &none  &none &none &none &none
+&bt BT_CLR        &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4                            &none  &none  &none  &none  &none  &none
+&ext_power EP_TOG &rgb_ug RGB_HUD &rgb_ug RGB_HUI &rgb_ug RGB_SAD &rgb_ug RGB_SAI &rgb_ug RGB_EFF                         &none  &none  &none  &none  &none  &none
+&none             &rgb_ug RGB_BRD &rgb_ug RGB_BRI &none           &none           &none                                   &none  &none  &none  &none  &none  &none
+&none             &none           &none           &none           &none           &none            &rgb_ug RGB_TOG         &none  &none  &none  &none  &none  &none
+                                  &trans          &trans          &trans          &trans           &trans          &trans &trans &trans &trans &trans
             >;
         };
 
+        extra1 {
+            status = "reserved";
+        };
+
+        extra2 {
+            status = "reserved";
+        };
     };
+};
+
+/* ===== Mouse feel tuning (ZMK v0.3) ===== */
+&mmv {
+        time-to-max-speed-ms = <220>;     /* default ~300, faster ramp */
+        acceleration-exponent = <1>;      /* predictable */
+};
+
+&msc {
+        time-to-max-speed-ms = <200>;
+        acceleration-exponent = <0>;      /* linear scroll feel */
 };
