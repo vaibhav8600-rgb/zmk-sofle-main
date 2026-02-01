@@ -42,4 +42,7 @@ if SHIELD_CENTRAL_DONGLE || SHIELD_SOFLE_LEFT || SHIELD_SOFLE_RIGHT
 config ZMK_SPLIT
     default y
 
+config ZMK_BLE
+    default y
+
 endif
