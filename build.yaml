@@ -21,3 +21,4 @@ include:
   - board: nice_nano
     shield: settings_reset
     artifact-name: settings_reset
+  
