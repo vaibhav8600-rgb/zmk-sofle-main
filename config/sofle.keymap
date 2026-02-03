@@ -149,15 +149,15 @@
         raise_layer {
             display-name = "raise";
 // ------------------------------------------------------------------------------------------------------------
-// | BTCLR | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                |      |      |       |      |       |       |
-// |BT_CLR_ALL| INS | PSCR | GUI |       |      |                | PGUP |      |   ^   |      |       |       |
-// |       | ALT  | LCLK |   M↑  |  RCLK | MCLK |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
-// |       | UNDO |  M←  |   M↓  |  M→   |      |      |  |      |      |      |       |      |       |       |
-//                |      |       |       |      |      |  |      |      |      |       |      |
+// | BTCLR | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                | OUT_TOG | OUT_BLE | OUT_USB |      |       |       |
+// |BT_CLR_ALL| INS | PSCR | GUI |       |      |                | PGUP    |      |   ^   |      |       |       |
+// |       | ALT  | LCLK |   M↑  |  RCLK | MCLK |                | PGDN    |   <- |   v   |  ->  |  DEL  | BKSPC |
+// |       | UNDO |  M←  |   M↓  |  M→   |      |      |  |      |         |      |       |      |       |       |
+//                |      |       |       |      |      |  |      |         |      |       |      |
             bindings = <
-&bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1      &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                       &trans    &trans    &trans   &trans    &trans  &trans
-&bt BT_CLR_ALL     &kp INS      &kp PSCRN         &kp K_CMENU      &trans           &trans                     &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
-&trans     &kp LALT     &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT &kp DEL &kp BSPC
+&bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1      &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                       &out OUT_TOG    &out OUT_BLE    &out OUT_USB   &trans    &trans  &trans
+&bt BT_CLR_ALL     &kp INS      &kp PSCRN         &kp K_CMENU      &trans           &trans             &kp PG_UP       &trans          &kp UP         &trans    &kp N0  &trans
+&trans     &kp LALT     &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_DN       &kp LEFT        &kp DOWN       &kp RIGHT &kp DEL &kp BSPC
 &trans     &kp K_UNDO   &mmv MOVE_LEFT    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &trans        &trans  &trans  &trans    &multi_win_apps    &trans   &trans    &trans  &trans
                         &trans       &trans       &trans       &trans        &trans  &trans  &trans    &trans    &trans   &trans
             >;
