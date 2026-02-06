@@ -24,6 +24,16 @@ A highly customized ZMK firmware for the Sofle keyboard, utilizing a **dedicated
 
 ---
 
+### Product & Wiring Images
+
+- **Product Image**
+
+	![Product Image](images/produuct%20image.jpeg)
+
+- **Wiring Diagram**
+
+	![Wiring Diagram](images/wiring.webp)
+
 ## ⌨️ Default Keymap Layers
 
 | Layer | Function | Key Features |
