@@ -4,8 +4,8 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    - name: joaopedropio
-      url-base: https://github.com/joaopedropio
+    - name: vaibhav8600-rgb
+      url-base: https://github.com/vaibhav8600-rgb
     - name: m165437 #new entry
       url-base: https://github.com/M165437
   projects:
@@ -14,7 +14,7 @@ manifest:
       revision: main
       import: app/west.yml
     - name: snake-module
-      remote: joaopedropio
+      remote: vaibhav8600-rgb
       revision: zephyr-4.1
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
