@@ -28,7 +28,7 @@ A highly customized ZMK firmware for the Sofle keyboard, utilizing a **dedicated
 
 - **Product Image**
 - 
-	![Product Image](images/1770889269846.jfif)	![Product Image](images/1770889270673.jfif)
+	
 	![Product Image](images/produuct%20img.jpeg)
 
 - **Wiring Diagram**
