@@ -10,10 +10,10 @@ include:
     shield: central_dongle snake_adapter
     artifact-name: snake_dongle
   - board: nice_nano
-    shield: sofle_left_peripheral nice_view_adapter nice_view
+    shield: sofle_left_peripheral nice_view_adapter nice_view_gem
     artifact-name: sofle_left_peripheral
   - board: nice_nano
-    shield: sofle_right nice_view_adapter nice_view
+    shield: sofle_right nice_view_adapter nice_view_gem
     artifact-name: sofle_right
   - board: nice_nano
     shield: settings_reset
