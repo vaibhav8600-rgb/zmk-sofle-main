@@ -15,7 +15,7 @@ manifest:
       import: app/west.yml
     - name: snake-module
       remote: vaibhav8600-rgb
-      revision: zephyr-4.1
+      revision: master
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
       revision: main #new entry
