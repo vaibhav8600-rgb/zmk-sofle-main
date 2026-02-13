@@ -18,6 +18,6 @@ manifest:
       revision: master
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
-      revision: v0.3 #new entry
+      revision: v0.3.0 #new entry
   self:
     path: config
