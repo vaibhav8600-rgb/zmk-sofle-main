@@ -188,6 +188,11 @@
 // ------------------------------------------------------------------------------------------------------------
 // | Snake Mode — all keys masked except arrow cluster (IJKL) for direction control                           |
 // | Combo 4+5 toggles this layer on/off                                                                      |
+// |                                                                                                           |
+// | NOTE: The game coordinate system is rotated 90° CCW vs the display.                                      |
+// |   game UP(0)=visual RIGHT, game RIGHT(1)=visual UP,                                                      |
+// |   game DOWN(2)=visual LEFT, game LEFT(3)=visual DOWN.                                                    |
+// |   Params below compensate so IJKL map to visual UP/LEFT/DOWN/RIGHT.                                      |
 // ------------------------------------------------------------------------------------------------------------
 // |       |     |     |      |      |      |                   |      |      |       |      |       |       |
 // |       |     |     |      |      |      |                   |      |      |  UP   |      |       |       |
@@ -196,8 +201,8 @@
 //               |     |      |      | LOWER|        |  |       | RAISE|      |       |      |
             bindings = <
 &none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &none
-&none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 0   &none           &none  &none
-&none  &none  &none  &none  &none  &none                                      &none  &snake_dir 3   &snake_dir 2   &snake_dir 1    &none  &none
+&none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 1   &none           &none  &none
+&none  &none  &none  &none  &none  &none                                      &none  &snake_dir 2   &snake_dir 3   &snake_dir 0    &none  &none
 &none  &none  &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
               &none  &none  &none  &tog LOWER &none                 &none     &tog RAISE     &none  &none          &none
             >;
