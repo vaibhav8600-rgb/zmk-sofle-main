@@ -193,13 +193,13 @@
 // |       |     |     |      |      |      |                   |      |      |  UP   |      |       |       |
 // |       |     |     |      |      |      |                   |      | LEFT | DOWN  | RIGHT|       |       |
 // |       |     |     |      |      |      |        |  |       |      |      |       |      |       |       |
-//               |     |      |      |      |        |  |       | TOG  |      |       |      |
+//               |     |      |      | LOWER|        |  |       | RAISE|      |       |      |
             bindings = <
 &none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &none
 &none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 0   &none           &none  &none
 &none  &none  &none  &none  &none  &none                                      &none  &snake_dir 3   &snake_dir 2   &snake_dir 1    &none  &none
 &none  &none  &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
-              &none  &none  &none  &none   &none                    &none     &tog NAV_SNAKE &none  &none          &none
+              &none  &none  &none  &tog LOWER &none                 &none     &tog RAISE     &none  &none          &none
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
