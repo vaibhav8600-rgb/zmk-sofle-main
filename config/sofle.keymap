@@ -21,8 +21,15 @@
 #define LOWER 1
 #define RAISE 2
 #define ADJUST 3
+#define NAV_SNAKE 4
 
 / {
+    // ---------- SNAKE DIRECTION BEHAVIOR ----------
+    snake_dir: snake_dir {
+        compatible = "zmk,behavior-snake-direction";
+        #binding-cells = <1>;
+    };
+
     // ---------- TAP-DANCE FOR CUSTOM LAYER BEHAVIOR ----------
     tap_dance_lower: tap_dance_lower {
         compatible = "zmk,behavior-tap-dance";
@@ -68,6 +75,17 @@
             key-positions = <26 27 28>;  // A, S, D 
             timeout-ms = <65>;
             bindings = <&kp LC(A)>;
+        };
+
+        combo_snake_toggle {
+            /*
+            * 4 + 5 (left-hand number row, positions 4 & 5)
+            * Toggle into / out-of Snake Mode layer
+            */
+            timeout-ms = <80>;
+            key-positions = <4 5>;  // number-row 4 + 5
+            layers = <BASE NAV_SNAKE>;
+            bindings = <&tog NAV_SNAKE>;
         };
 
     };
@@ -184,7 +202,25 @@
         };
 
         extra1 {
-            status = "reserved";
+            display-name = "snake";
+// ------------------------------------------------------------------------------------------------------------
+// | Snake Mode — all keys masked except arrow cluster (IJKL) for direction control                           |
+// | Combo 4+5 toggles this layer on/off                                                                      |
+// ------------------------------------------------------------------------------------------------------------
+// |       |     |     |      |      |      |                   |      |      |       |      |       |       |
+// |       |     |     |      |      |      |                   |      |      |  UP   |      |       |       |
+// |       |     |     |      |      |      |                   |      | LEFT | DOWN  | RIGHT|       |       |
+// |       |     |     |      |      |      |        |  |       |      |      |       |      |       |       |
+//               |     |      |      |      |        |  |       | TOG  |      |       |      |
+            bindings = <
+&none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &none
+&none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 0   &none           &none  &none
+&none  &none  &none  &none  &none  &none                                      &none  &snake_dir 3   &snake_dir 2   &snake_dir 1    &none  &none
+&none  &none  &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
+              &none  &none  &none  &none   &none                    &none     &tog NAV_SNAKE &none  &none          &none
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
         };
 
         extra2 {
