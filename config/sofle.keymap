@@ -20,8 +20,7 @@
 #define BASE 0
 #define LOWER 1
 #define RAISE 2
-#define ADJUST 3
-#define NAV_SNAKE 4
+#define NAV_SNAKE 3
 
 / {
     // ---------- SNAKE DIRECTION BEHAVIOR ----------
@@ -45,12 +44,12 @@
         bindings = <&mo RAISE>, <&tog RAISE>;
     };
 
-    // Activate ADJUST layer when LOWER and RAISE are both active
+    // Activate NAV_SNAKE layer when LOWER and RAISE are both active
     conditional_layers {
         compatible = "zmk,conditional-layers";
-        adjust_layer {
+        snake_layer {
             if-layers = <LOWER RAISE>;
-            then-layer = <ADJUST>;
+            then-layer = <NAV_SNAKE>;
         };
     };
 
@@ -184,24 +183,7 @@
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
         };
 
-        adjust_layer {
-// ----------------------------------------------------------------------------------------------------------------------------
-// | BTCLR  |  BT1    |  BT2    |   BT3   |   BT4   |   BT5   |                  |      |      |       |      |       |       |
-// | EXTPWR | RGB_HUD | RGB_HUI | RGB_SAD | RGB_SAI | RGB_EFF |                  |      |      |       |      |       |       |
-// |        | RGB_BRD | RGB_BRI |         |         |         |                  |      |      |       |      |       |       |
-// |        |         |         |         |         |         | RGB_TOG | |      |      |      |       |      |       |       |
-//                    |         |         |         |         |         | |      |      |      |       |      |
-            display-name = "adjust";
-            bindings = <
-&bt BT_CLR        &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4                            &none  &none  &none  &none  &none  &none
-&ext_power EP_TOG &rgb_ug RGB_HUD &rgb_ug RGB_HUI &rgb_ug RGB_SAD &rgb_ug RGB_SAI &rgb_ug RGB_EFF                         &none  &none  &none  &none  &none  &none
-&none             &rgb_ug RGB_BRD &rgb_ug RGB_BRI &none           &none           &none                                   &none  &none  &none  &none  &none  &none
-&none             &none           &none           &none           &none           &none            &rgb_ug RGB_TOG         &none  &none  &none  &none  &none  &none
-                                  &trans          &trans          &trans          &trans           &trans          &trans &trans &trans &trans &trans
-            >;
-        };
-
-        extra1 {
+        nav_snake_layer {
             display-name = "snake";
 // ------------------------------------------------------------------------------------------------------------
 // | Snake Mode — all keys masked except arrow cluster (IJKL) for direction control                           |
