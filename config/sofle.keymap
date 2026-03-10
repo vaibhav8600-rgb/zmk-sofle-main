@@ -23,6 +23,12 @@
 #define NAV_SNAKE 3
 
 / {
+    // ---------- DONGLE ACTION BEHAVIOR (toggle snake / menu) ----------
+    dongle_action: dongle_action {
+        compatible = "zmk,behavior-dongle-action";
+        #binding-cells = <0>;
+    };
+
     // ---------- SNAKE DIRECTION BEHAVIOR ----------
     snake_dir: snake_dir {
         compatible = "zmk,behavior-snake-direction";
@@ -200,7 +206,7 @@
 // |       |     |     |      |      |      |        |  |       |      |      |       |      |       |       |
 //               |     |      |      | LOWER|        |  |       | RAISE|      |       |      |
             bindings = <
-&none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &none
+&none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action
 &none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 1   &none           &none  &none
 &none  &none  &none  &none  &none  &none                                      &none  &snake_dir 2   &snake_dir 3   &snake_dir 0    &none  &none
 &none  &none  &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
