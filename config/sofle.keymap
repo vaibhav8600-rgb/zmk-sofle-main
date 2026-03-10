@@ -23,12 +23,6 @@
 #define NAV_SNAKE 3
 
 / {
-    // ---------- DONGLE ACTION BEHAVIOR (toggle snake / menu) ----------
-    dongle_action: dongle_action {
-        compatible = "zmk,behavior-dongle-action";
-        #binding-cells = <0>;
-    };
-
     // ---------- SNAKE DIRECTION BEHAVIOR ----------
     snake_dir: snake_dir {
         compatible = "zmk,behavior-snake-direction";
@@ -120,6 +114,14 @@
             bindings = <&msc>, <&msc>;
             tap-ms = <20>;
         };
+
+        // Dongle action toggle (snake <-> menu). Defined here so peripheral
+        // builds compile; merges with the identical node in snake_adapter.overlay
+        // on the dongle build.
+        dongle_action_behavior: dongle_action_behavior {
+            compatible = "zmk,behavior-dongle-action";
+            #binding-cells = <0>;
+        };
     };
 
     keymap {
@@ -206,7 +208,7 @@
 // |       |     |     |      |      |      |        |  |       |      |      |       |      |       |       |
 //               |     |      |      | LOWER|        |  |       | RAISE|      |       |      |
             bindings = <
-&none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action
+&none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action_behavior
 &none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 1   &none           &none  &none
 &none  &none  &none  &none  &none  &none                                      &none  &snake_dir 2   &snake_dir 3   &snake_dir 0    &none  &none
 &none  &none  &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
