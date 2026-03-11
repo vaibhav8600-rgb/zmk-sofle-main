@@ -12,10 +12,11 @@
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/outputs.h>
 
-/* ===== Mouse sweet-spot defaults (ZMK v0.3) ===== */
+/* ===== Pointing defaults (ZMK main) ===== */
 #define ZMK_POINTING_DEFAULT_MOVE_VAL 1200
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 17
-#include <dt-bindings/zmk/mouse.h>
+/* NEW: Replaced mouse.h with pointing.h for latest ZMK main branch */
+#include <dt-bindings/zmk/pointing.h>
 
 #define BASE 0
 #define LOWER 1
