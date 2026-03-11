@@ -14,7 +14,7 @@
 
 /* ===== Pointing defaults (ZMK main) ===== */
 #define ZMK_POINTING_DEFAULT_MOVE_VAL 1200
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 17
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 120
 /* NEW: Replaced mouse.h with pointing.h for latest ZMK main branch */
 #include <dt-bindings/zmk/pointing.h>
 
@@ -113,7 +113,7 @@
             compatible = "zmk,behavior-sensor-rotate-var";
             #sensor-binding-cells = <2>;
             bindings = <&msc>, <&msc>;
-            tap-ms = <20>;
+            tap-ms = <50>;
         };
 
         // Dongle action toggle (snake <-> menu). Defined here so peripheral
