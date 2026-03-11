@@ -150,7 +150,7 @@
                               &kp LGUI       &kp LALT       &kp LCTRL      &tap_dance_lower  &kp RET                      &kp SPACE    &tap_dance_raise &kp RCTRL          &kp RALT  &kp RGUI
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_DOWN SCRL_UP>;
         };
 
         lower_layer {
@@ -169,7 +169,7 @@
                     &trans    &trans      &trans    &trans     &trans &trans  &trans    &trans   &trans    &trans
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_DOWN SCRL_UP>;
         };
 
         raise_layer {
@@ -188,7 +188,7 @@
                         &trans       &trans       &trans       &trans        &trans  &trans  &trans    &trans    &trans   &trans
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_DOWN SCRL_UP>;
         };
 
         nav_snake_layer {
@@ -215,7 +215,7 @@
               &none  &none  &none  &tog LOWER &none                 &none     &tog RAISE     &none  &none          &none
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc MOVE_DOWN MOVE_UP>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_DOWN SCRL_UP>;
         };
 
         extra2 {
