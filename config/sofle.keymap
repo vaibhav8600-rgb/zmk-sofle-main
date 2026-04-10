@@ -176,19 +176,19 @@
         raise_layer {
             display-name = "raise";
 // ------------------------------------------------------------------------------------------------------------
-// | BTCLR | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                |      |      |       |      |       |       |
-// | BT_CLR_ALL  | INS | PSCR | GUI |       |      |                | PGUP |      |   ^   |      |       |       |
-// |OUT_USB| OUT_TOG | LCLK |   M↑  |  RCLK | MCLK |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
-// |       | OUT_BLE |  M←  |   M↓  |  M→   |      |      |  |      |      |      |       |      |       |       |
-//                |      |       |       |      |      |  |      |      |      |       |      |
+// | BTCLR       | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                |      |      |       |      |       |       |
+// | BT_CLR_ALL  | INS  | LCLK |   M↑  |  RCLK | MCLK |                | PGUP |      |   ^   |      |       |       |
+// | OUT_USB  | OUT_TOG |  M←  |   M↓  |  M←   | LCLK |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
+// |          | OUT_BLE |  GUI |  PSCR |  M→   |      |      |  |      |      |      |       |      |       |       |
+//               |      |       |       |      |      |      |  |      |      |      |       |
             bindings = <
 &bt BT_CLR         &bt BT_SEL 0     &bt BT_SEL 1      &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                       &trans    &trans    &trans   &trans    &trans  &trans
-&bt BT_CLR_ALL     &kp INS          &kp PSCRN         &kp K_CMENU      &trans           &trans                     &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
-&out OUT_USB       &out OUT_TOG     &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT &kp DEL &kp BSPC
-&trans             &out OUT_BLE     &mmv MOVE_LEFT    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &trans        &trans  &trans  &trans    &multi_win_apps    &trans   &trans    &trans  &trans
+&bt BT_CLR_ALL     &kp INS          &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
+&out OUT_USB       &out OUT_TOG     &mmv MOVE_LEFT    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &mkp LCLK                  &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT &kp DEL &kp BSPC
+&trans             &out OUT_BLE     &kp K_CMENU       &kp PSCRN        &trans           &trans        &trans  &trans  &trans    &multi_win_apps    &trans   &trans    &trans  &trans
                         &trans       &trans       &trans       &trans        &trans  &trans  &trans    &trans    &trans   &trans
             >;
-
+            
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_UP SCRL_DOWN>;
         };
 
