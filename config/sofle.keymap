@@ -3,8 +3,6 @@
  *
  * SPDX-License-Identifier: MIT
  */
- 
-
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
@@ -12,7 +10,9 @@
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/outputs.h>
 
-/* ===== Pointing defaults (ZMK main) ===== */
+/* --------------------------------------------------------------------------
+ * Pointing defaults
+ * -------------------------------------------------------------------------- */
 #define ZMK_POINTING_DEFAULT_MOVE_VAL 1200
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 65
 /* NEW: Replaced mouse.h with pointing.h for latest ZMK main branch */
@@ -24,6 +24,9 @@
 #define NAV_SNAKE 3
 
 / {
+    /* ----------------------------------------------------------------------
+     * Custom behaviors
+     * ---------------------------------------------------------------------- */
     // ---------- SNAKE DIRECTION BEHAVIOR ----------
     snake_dir: snake_dir {
         compatible = "zmk,behavior-snake-direction";
@@ -45,7 +48,7 @@
         bindings = <&mo RAISE>, <&tog RAISE>;
     };
 
-    // Activate NAV_SNAKE layer when LOWER and RAISE are both active
+    /* Activate NAV_SNAKE layer when LOWER and RAISE are both active. */
     conditional_layers {
         compatible = "zmk,conditional-layers";
         snake_layer {
@@ -54,7 +57,9 @@
         };
     };
 
-    // J + K + L combo -> Enter (RET) on BASE layer
+    /* ----------------------------------------------------------------------
+     * Combos
+     * ---------------------------------------------------------------------- */
     combos {
         compatible = "zmk,combos";
 
@@ -66,11 +71,7 @@
         };
 
         combo_asd_select_all {
-
-            /*
-            * A + S + D (left hand home row)
-            * Extremely safe: no accidental rolls
-            */
+            /* A + S + D on the left home row. */
             layers = <BASE>;
             key-positions = <26 27 28>;  // A, S, D 
             timeout-ms = <65>;
@@ -90,7 +91,10 @@
 
     };
 
-    // 🔮 Magic macro: Win+1 → Win+2 → Win+3 → Win+4 → Win+5
+    /* ----------------------------------------------------------------------
+     * Macros
+     * ---------------------------------------------------------------------- */
+    /* Launch or focus pinned Windows apps 1 through 5. */
     macros {
         multi_win_apps: multi_win_apps {
             compatible = "zmk,behavior-macro";
@@ -108,7 +112,7 @@
     };
 
     behaviors {
-          // THIS FIXES THE ERROR: Define the behavior for the scroll wheel
+        /* Scroll wheel behavior for the encoder sensor. */
         inc_dec_msc: inc_dec_msc {
             compatible = "zmk,behavior-sensor-rotate-var";
             #sensor-binding-cells = <2>;
@@ -130,19 +134,20 @@
 
         default_layer {
             display-name = "default";
-// ------------------------------------------------------------------------------------------------------------
-// |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |  DEL  |
-// |  ESC  |  Q  |  W  |  E   |  R   |  T   |                   |  Y   |  U    |  I    |  O   |   P   | BKSPC |
-// |  TAB  |  A  |  S  |  D   |  F   |  G   |                   |  H   |  J    |  K    |  L   |   ;   |   '   |
-// | SHIFT |  Z  |  X  |  C   |  V   |  B   | TEAMS  |  | APPS |  N   |  M    |  ,    |  .   |   /   | SHIFT |
-//               | GUI | ALT  | CTRL | LOWER|  ENTER |  | SPACE | RAISE| CTRL  | ALT   | GUI  |
-//
-// Note: On default layer:
-//   - Tap A/X/C/V = a/x/c/v
-//   - Double Tap  = Ctrl+A
-//   - Hold X/C/V  = Ctrl+X / Ctrl+C / Ctrl+V
-//   - Hold X      = Ctrl+Z
-//   - Hold Y      = Ctrl+Y
+            /*
+             * DEFAULT
+             * ,-----------------------------------------------.   ,-----------------------------------------------.
+             * | ` Caps | Win1 | Win2 | Win3 | Win4 | Win5     |   |  6   |  7   |  8   |  9   |  0   | Del      |
+             * | Esc    |  Q   |  W   |  E   |  R   |  T       |   | C-Y  |  U   |  I   |  O   |  P   | Bksp     |
+             * | Tab    |  A   |  S   |  D   |  F   |  G       |   |  H   |  J   |  K   |  L   |  ;   | '        |
+             * | Shift  | C-Z  | C-X  | C-C  | C-V  |  B |Teams|   | Apps |  N   |  M   |  ,   |  .   |  / |Shift|
+             * `-----------------------------+------+-------'   `------+-------+-----------------------------'
+             *            | Gui  | Alt  | Ctrl | Lower | Enter |   | Space | Raise | Ctrl | Alt  | Gui |
+             *            `------------------------------------'   `-----------------------------------'
+             *
+             * Encoder pushes: left = Teams mic mute, right = multi app macro.
+             * Combos: A+S+D = Ctrl+A, J+K+L = Enter, 4+5 = Snake layer toggle.
+             */
             bindings = <
 &mt CLCK GRAVE &mt LG(N1) N1  &mt LG(N2) N2  &mt LG(N3) N3  &mt LG(N4) N4  &mt LG(N5) N5                                        &kp N6       &kp N7    &kp N8             &kp N9    &kp N0   &kp DEL
 &kp ESC        &kp Q          &kp W          &kp E          &kp R          &kp T                                                &mt LC(Y) Y  &kp U     &kp I              &kp O     &kp P    &kp BSPC
@@ -156,12 +161,15 @@
 
         lower_layer {
             display-name = "lower";
-// ------------------------------------------------------------------------------------------------------------
-// |       |  F1 |  F2 |  F3  |  F4  |  F5  |                   |  F6  |  F7   |  F8   |  F9  |  F10  |  F11  |
-// |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |  F12  |
-// |       |  !  |  @  |  #   |  $   |  %   |                   |  ^   |  &    |  *    |  (   |   )   |   |   |
-// |       |  =  |  -  |  +   |  {   |  }   |        |  |       |  [   |  ]    |  ;    |  :   |   \   |       |
-//               |     |      |      |      |        |  |       |      |       |       |      |
+            /*
+             * LOWER
+             * ,-----------------------------------------------.   ,-----------------------------------------------.
+             * | trans | F1   | F2   | F3   | F4   | F5        |   | F6   | F7   | F8   | F9   | F10  | F11      |
+             * | `     | 1    | 2    | 3    | 4    | 5         |   | 6    | 7    | 8    | 9    | 0    | F12      |
+             * | trans | !    | @    | #    | $    | %         |   | ^    | &    | *    | (    | )    | |        |
+             * | trans | =    | -    | +    | {    | } |trans  |   |trans | [    | ]    | ;    | :    | \ |trans |
+             * `-----------------------------+------+-------'   `------+-------+-----------------------------'
+             */
             bindings = <
 &trans    &kp F1    &kp F2    &kp F3      &kp F4    &kp F5                    &kp F6    &kp F7   &kp F8    &kp F9    &kp F10   &kp F11
 &kp GRAVE &kp N1    &kp N2    &kp N3      &kp N4    &kp N5                    &kp N6    &kp N7   &kp N8    &kp N9    &kp N0    &kp F12
@@ -175,12 +183,15 @@
 
         raise_layer {
             display-name = "raise";
-// ------------------------------------------------------------------------------------------------------------
-// | BTCLR       | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                |      |      |       |      |       |       |
-// | BT_CLR_ALL  | INS  | LCLK |   M↑  |  RCLK | MCLK |                | PGUP |      |   ^   |      |       |       |
-// | OUT_USB  | OUT_TOG |  M←  |   M↓  |  M←   | LCLK |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
-// |          | OUT_BLE |  GUI |  PSCR |  M→   |      |      |  |      |      |      |       |      |       |       |
-//               |      |       |       |      |      |      |  |      |      |      |       |
+            /*
+             * RAISE
+             * ,------------------------------------------------.   ,-----------------------------------------------.
+             * | BTClr | BT1  | BT2  | BT3  | BT4  | BT5       |   | trans| trans| trans| trans| trans| trans    |
+             * | BTAll | Ins  | LClk | MUp  | RClk | MClk      |   | PgUp | trans| Up   | trans| 0    | trans    |
+             * | USB   | Out  | MLeft| MDown| MRight|LClk      |   | PgDn | Left | Down | Right| Del  | Bksp     |
+             * | trans | BLE  | Menu | PrScr| trans|trans|trans|   |trans | trans| trans| trans| trans|trans|trans|
+             * `------------------------------+------+------'    `------+-------+-----------------------------'
+             */
             bindings = <
 &bt BT_CLR         &bt BT_SEL 0     &bt BT_SEL 1      &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                       &trans    &trans    &trans   &trans    &trans  &trans
 &bt BT_CLR_ALL     &kp INS          &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
@@ -194,20 +205,25 @@
 
         nav_snake_layer {
             display-name = "snake";
-// ------------------------------------------------------------------------------------------------------------
-// | Snake Mode — all keys masked except arrow cluster (IJKL) for direction control                           |
-// | Combo 4+5 toggles this layer on/off                                                                      |
-// |                                                                                                           |
-// | NOTE: The game coordinate system is rotated 90° CCW vs the display.                                      |
-// |   game UP(0)=visual RIGHT, game RIGHT(1)=visual UP,                                                      |
-// |   game DOWN(2)=visual LEFT, game LEFT(3)=visual DOWN.                                                    |
-// |   Params below compensate so IJKL map to visual UP/LEFT/DOWN/RIGHT.                                      |
-// ------------------------------------------------------------------------------------------------------------
-// |       |     |     |      |      |      |                   |      |      |       |      |       |action |
-// |       |     |     |      |      |      |                   |      |      |  UP   |      |       |       |
-// |       |     |     |      |      |      |                   |      | LEFT | DOWN  | RIGHT|       |       |
-// |       |     |     |      |      |      |        |  |       |      |      |       |      |       |       |
-//               |     |      |      | LOWER|        |  |       | RAISE|      |       |      |
+            /*
+             * SNAKE
+             * All keys are masked except I/J/K/L direction controls and the
+             * dongle action key. Combo 4+5 toggles this layer on and off.
+             *
+             * The game coordinate system is rotated 90 degrees CCW vs the
+             * display, so the params below compensate:
+             *   game UP(0)    = visual RIGHT
+             *   game RIGHT(1) = visual UP
+             *   game DOWN(2)  = visual LEFT
+             *   game LEFT(3)  = visual DOWN
+             *
+             * ,-----------------------------------------------.   ,-----------------------------------------------.
+             * | none  | none | none | none | none | none      |   | none | none | none | none | none | action   |
+             * | none  | none | none | none | none | none      |   | none | none | Up   | none | none | none     |
+             * | none  | none | none | none | none | none      |   | none | Left | Down | Right| none | none     |
+             * | none  | none | none | none | none | none|none |   |none | none | none | none | none |none |none |
+             * `-----------------------------+------+-------'   `------+-------+-----------------------------'
+             */
             bindings = <
 &none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action_behavior
 &none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 1   &none           &none  &none
@@ -225,7 +241,9 @@
     };
 };
 
-/* ===== Mouse feel tuning (ZMK v0.3) ===== */
+/* --------------------------------------------------------------------------
+ * Mouse feel tuning
+ * -------------------------------------------------------------------------- */
 &mmv {
         time-to-max-speed-ms = <220>;     /* default ~300, faster ramp */
         acceleration-exponent = <1>;      /* predictable */
