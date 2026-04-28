@@ -134,7 +134,7 @@
 // |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |  DEL  |
 // |  ESC  |  Q  |  W  |  E   |  R   |  T   |                   |  Y   |  U    |  I    |  O   |   P   | BKSPC |
 // |  TAB  |  A  |  S  |  D   |  F   |  G   |                   |  H   |  J    |  K    |  L   |   ;   |   '   |
-// | SHIFT |  Z  |  X  |  C   |  V   |  B   |  MUTE  |  |      |  N   |  M    |  ,    |  .   |   /   | SHIFT |
+// | SHIFT |  Z  |  X  |  C   |  V   |  B   | TEAMS  |  | APPS |  N   |  M    |  ,    |  .   |   /   | SHIFT |
 //               | GUI | ALT  | CTRL | LOWER|  ENTER |  | SPACE | RAISE| CTRL  | ALT   | GUI  |
 //
 // Note: On default layer:
@@ -147,8 +147,8 @@
 &mt CLCK GRAVE &mt LG(N1) N1  &mt LG(N2) N2  &mt LG(N3) N3  &mt LG(N4) N4  &mt LG(N5) N5                                        &kp N6       &kp N7    &kp N8             &kp N9    &kp N0   &kp DEL
 &kp ESC        &kp Q          &kp W          &kp E          &kp R          &kp T                                                &mt LC(Y) Y  &kp U     &kp I              &kp O     &kp P    &kp BSPC
 &kp TAB        &kp A          &kp S          &kp D          &kp F          &kp G                                                &kp H        &kp J     &kp K              &kp L     &kp SEMI &kp SQT
-&kp LSHFT      &mt LC(Z) Z    &mt LC(X) X    &mt LC(C) C    &mt LC(V) V    &kp B      &kp C_MUTE                   &none        &kp N     &mt LC(LS(M)) M    &kp COMMA &kp DOT  &kp FSLH &kp RSHFT
-                              &kp LGUI       &kp LALT       &kp LCTRL      &tap_dance_lower  &kp RET                      &kp SPACE    &tap_dance_raise &kp RCTRL          &kp RALT  &kp RGUI
+&kp LSHFT      &mt LC(Z) Z    &mt LC(X) X    &mt LC(C) C    &mt LC(V) V    &kp B      &kp LC(LS(M))             &multi_win_apps &kp N        &kp M     &kp COMMA          &kp DOT  &kp FSLH &kp RSHFT
+                              &kp LGUI       &kp LALT       &kp LCTRL      &tap_dance_lower  &kp RET            &kp SPACE   &tap_dance_raise &kp RCTRL &kp RALT           &kp RGUI
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_UP SCRL_DOWN>;
@@ -185,7 +185,7 @@
 &bt BT_CLR         &bt BT_SEL 0     &bt BT_SEL 1      &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                       &trans    &trans    &trans   &trans    &trans  &trans
 &bt BT_CLR_ALL     &kp INS          &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
 &out OUT_USB       &out OUT_TOG     &mmv MOVE_LEFT    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &mkp LCLK                  &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT &kp DEL &kp BSPC
-&trans             &out OUT_BLE     &kp K_CMENU       &kp PSCRN        &trans           &trans        &trans  &trans  &trans    &multi_win_apps    &trans   &trans    &trans  &trans
+&trans             &out OUT_BLE     &kp K_CMENU       &kp PSCRN        &trans           &trans       &trans &trans &trans    &trans    &trans   &trans    &trans  &trans
                         &trans       &trans       &trans       &trans        &trans  &trans  &trans    &trans    &trans   &trans
             >;
             
