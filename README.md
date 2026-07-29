@@ -47,6 +47,7 @@
 - Dongle-side ST7789V snake/status UI with custom splash art, colors, sounds, WPM, layer, connectivity, modifiers, and battery data.
 - Both peripherals use nice!view e-paper displays through `nice_view_adapter nice_view_gem`.
 - EC11 encoders, pointer movement, mouse buttons, scrolling, output switching, Bluetooth profile controls, combos, and Windows workflow shortcuts.
+- Anti-idle mouse jiggler: toggle humanized cursor micro-movements from the snake layer to keep the host awake, with a green on-screen indicator on the dongle.
 - Deep sleep, boosted BLE TX power, and central battery fetching are enabled.
 
 ---
@@ -141,7 +142,7 @@ This firmware has exactly these layers:
 0 BASE       Typing, Windows shortcuts, Teams mute, app macro
 1 LOWER      Numbers, symbols, function keys
 2 RAISE      Bluetooth, output switching, arrows, pointer controls
-3 NAV_SNAKE  Snake game controls and dongle action
+3 NAV_SNAKE  Snake game controls, anti-idle toggle, dongle action
 ```
 
 There is no `ADJUST` layer in [`config/sofle.keymap`](config/sofle.keymap). Holding `LOWER` and `RAISE` together activates `NAV_SNAKE`, because the conditional layer is configured this way:
@@ -198,7 +199,7 @@ The snake layer is defined as `NAV_SNAKE` / layer `3` in [`config/sofle.keymap`]
 
 ### What Snake Layer Does
 
-Most keys are intentionally disabled with `&none` so typing keys do not interfere with the game. Only the snake controls, dongle action key, and a couple of layer toggles remain active.
+Most keys are intentionally disabled with `&none` so typing keys do not interfere with the game. Only the snake controls, dongle action key, anti-idle toggle, and a couple of layer toggles remain active.
 
 ```text
 Right half controls while NAV_SNAKE is active
@@ -206,7 +207,18 @@ Right half controls while NAV_SNAKE is active
 Top row:                         far-right key = dongle action
 Home-row cluster:                I / J / K / L = snake directions
 Thumbs:                          Lower and Raise toggles remain available
+
+Left half: A = anti-idle (mouse jiggler) toggle
 ```
+
+### Anti-Idle (Mouse Jiggler)
+
+Press `A` while in the snake layer to toggle anti-idle on or off. While on, the dongle sends humanized mouse micro-movements (random bursts of ±1–2 px moves with random 20–60 s pauses) so the host never goes idle, locks, or sleeps.
+
+- Toggle on: the cursor gives a small twitch ~300 ms later as confirmation.
+- Status: a green square appears in the top-right of the dongle status screen while active.
+- It keeps running after you leave the snake layer — return and press `A` again to stop.
+- Implemented by `&anti_idle` (`zmk,behavior-anti-idle`) from the snake module; only the dongle sends the movements, so the halves' battery life is unaffected.
 
 ### Direction Keys
 
@@ -411,6 +423,8 @@ Useful Raise layer controls:
   confirm the correct half firmware is flashed and EC11 support is enabled in `config/sofle.conf`.
 - Mouse keys do nothing:
   confirm `CONFIG_ZMK_POINTING=y` remains enabled.
+- Anti-idle does not move the cursor:
+  confirm `CONFIG_ZMK_POINTING=y` is enabled for the dongle build and that the green indicator square is showing on the dongle status screen (press `A` in the snake layer to toggle).
 - Build cannot find snake symbols:
   confirm `snake-module` is present from `config/west.yml` and the dongle shield stack includes `snake_adapter`.
 
