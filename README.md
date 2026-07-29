@@ -47,7 +47,7 @@
 - Dongle-side ST7789V snake/status UI with custom splash art, colors, sounds, WPM, layer, connectivity, modifiers, and battery data.
 - Both peripherals use nice!view e-paper displays through `nice_view_adapter nice_view_gem`.
 - EC11 encoders, pointer movement, mouse buttons, scrolling, output switching, Bluetooth profile controls, combos, and Windows workflow shortcuts.
-- Anti-idle mouse jiggler: toggle humanized cursor micro-movements from the snake layer to keep the host awake, with a green on-screen indicator on the dongle.
+- Anti-idle mouse jiggler: toggle humanized cursor micro-movements from the snake layer to keep the host awake, with a green status dot on the dongle display.
 - Deep sleep, boosted BLE TX power, and central battery fetching are enabled.
 
 ---
@@ -216,7 +216,7 @@ Left half: A = anti-idle (mouse jiggler) toggle
 Press `A` while in the snake layer to toggle anti-idle on or off. While on, the dongle sends humanized mouse micro-movements (random bursts of ±1–2 px moves with random 20–60 s pauses) so the host never goes idle, locks, or sleeps.
 
 - Toggle on: the cursor gives a small twitch ~300 ms later as confirmation.
-- Status: a green square appears in the top-right of the dongle status screen while active.
+- Status: a bright green dot appears in the top-right of the dongle status screen while active.
 - It keeps running after you leave the snake layer — return and press `A` again to stop.
 - Implemented by `&anti_idle` (`zmk,behavior-anti-idle`) from the snake module; only the dongle sends the movements, so the halves' battery life is unaffected.
 
