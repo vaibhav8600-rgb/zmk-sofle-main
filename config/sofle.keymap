@@ -33,6 +33,12 @@
         #binding-cells = <1>;
     };
 
+    // ---------- ANTI-IDLE (HUMANIZED MOUSE JIGGLER) TOGGLE ----------
+    anti_idle: anti_idle {
+        compatible = "zmk,behavior-anti-idle";
+        #binding-cells = <0>;
+    };
+
     // ---------- TAP-DANCE FOR CUSTOM LAYER BEHAVIOR ----------
     tap_dance_lower: tap_dance_lower {
         compatible = "zmk,behavior-tap-dance";
@@ -210,6 +216,10 @@
              * All keys are masked except I/J/K/L direction controls and the
              * dongle action key. Combo 4+5 toggles this layer on and off.
              *
+             * The A key toggles anti-idle: press once = on (cursor twitches
+             * shortly after as confirmation), press again = off. Runs until
+             * toggled off, even after leaving this layer.
+             *
              * The game coordinate system is rotated 90 degrees CCW vs the
              * display, so the params below compensate:
              *   game UP(0)    = visual RIGHT
@@ -220,15 +230,15 @@
              * ,-----------------------------------------------.   ,-----------------------------------------------.
              * | none  | none | none | none | none | none      |   | none | none | none | none | none | action   |
              * | none  | none | none | none | none | none      |   | none | none | Up   | none | none | none     |
-             * | none  | none | none | none | none | none      |   | none | Left | Down | Right| none | none     |
+             * | none  |AntiI | none | none | none | none      |   | none | Left | Down | Right| none | none     |
              * | none  | none | none | none | none | none|none |   |none | none | none | none | none |none |none |
              * `-----------------------------+------+-------'   `------+-------+-----------------------------'
              */
             bindings = <
-&none  &none  &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action_behavior
-&none  &none  &none  &none  &none  &none                                      &none  &none          &snake_dir 1   &none           &none  &none
-&none  &none  &none  &none  &none  &none                                      &none  &snake_dir 2   &snake_dir 3   &snake_dir 0    &none  &none
-&none  &none  &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
+&none  &none       &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action_behavior
+&none  &none       &none  &none  &none  &none                                      &none  &none          &snake_dir 1   &none           &none  &none
+&none  &anti_idle  &none  &none  &none  &none                                      &none  &snake_dir 2   &snake_dir 3   &snake_dir 0    &none  &none
+&none  &none       &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
               &none  &none  &none  &tog LOWER &none                 &none     &tog RAISE     &none  &none          &none
             >;
 
