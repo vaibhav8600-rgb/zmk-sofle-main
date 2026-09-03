@@ -1,9 +1,14 @@
 #include <dt-bindings/zmk/matrix_transform.h>
+#include <layouts/josefadamcik/sofle.dtsi>
+
+/* ZMK Studio reads the physical layout from the central (this dongle). */
+&josefadamcik_sofle_layout {
+    transform = <&default_transform>;
+};
 
 / {
     chosen {
         zmk,kscan = &mock_kscan;
-        zmk,matrix-transform = &default_transform;
     };
 
     default_transform: keymap_transform_0 {

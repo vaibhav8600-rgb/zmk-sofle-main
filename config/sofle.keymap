@@ -195,14 +195,14 @@
              * | BTClr | BT1  | BT2  | BT3  | BT4  | BT5       |   | trans| trans| trans| trans| trans| trans    |
              * | BTAll | Ins  | LClk | MUp  | RClk | MClk      |   | PgUp | trans| Up   | trans| 0    | trans    |
              * | USB   | Out  | MLeft| MDown| MRight|LClk      |   | PgDn | Left | Down | Right| Del  | Bksp     |
-             * | trans | BLE  | Menu | PrScr| trans|trans|trans|   |trans | trans| trans| trans| trans|trans|trans|
+             * |Studio | BLE  | Menu | PrScr| trans|trans|trans|   |trans | trans| trans| trans| trans|trans|trans|
              * `------------------------------+------+------'    `------+-------+-----------------------------'
              */
             bindings = <
 &bt BT_CLR         &bt BT_SEL 0     &bt BT_SEL 1      &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                       &trans    &trans    &trans   &trans    &trans  &trans
 &bt BT_CLR_ALL     &kp INS          &mkp LCLK         &mmv MOVE_UP     &mkp RCLK        &mkp MCLK                  &kp PG_UP &trans    &kp UP   &trans    &kp N0  &trans
 &out OUT_USB       &out OUT_TOG     &mmv MOVE_LEFT    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &mkp LCLK                  &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT &kp DEL &kp BSPC
-&trans             &out OUT_BLE     &kp K_CMENU       &kp PSCRN        &trans           &trans       &trans &trans &trans    &trans    &trans   &trans    &trans  &trans
+&studio_unlock     &out OUT_BLE     &kp K_CMENU       &kp PSCRN        &trans           &trans       &trans &trans &trans    &trans    &trans   &trans    &trans  &trans
                         &trans       &trans       &trans       &trans        &trans  &trans  &trans    &trans    &trans   &trans
             >;
             
