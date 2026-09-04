@@ -220,12 +220,12 @@
              * shortly after as confirmation), press again = off. Runs until
              * toggled off, even after leaving this layer.
              *
-             * The game coordinate system is rotated 90 degrees CCW vs the
-             * display, so the params below compensate:
-             *   game UP(0)    = visual RIGHT
-             *   game RIGHT(1) = visual UP
-             *   game DOWN(2)  = visual LEFT
-             *   game LEFT(3)  = visual DOWN
+             * Directions are plain screen directions now - the renderer owns
+             * panel rotation (CONFIG_ROTATE_DISPLAY), so no compensation:
+             *   0 = UP    (I)
+             *   1 = RIGHT (L)
+             *   2 = DOWN  (K)
+             *   3 = LEFT  (J)
              *
              * ,-----------------------------------------------.   ,-----------------------------------------------.
              * | none  | none | none | none | none | none      |   | none | none | none | none | none | action   |
@@ -236,8 +236,8 @@
              */
             bindings = <
 &none  &none       &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action_behavior
-&none  &none       &none  &none  &none  &none                                      &none  &none          &snake_dir 1   &none           &none  &none
-&none  &anti_idle  &none  &none  &none  &none                                      &none  &snake_dir 2   &snake_dir 3   &snake_dir 0    &none  &none
+&none  &none       &none  &none  &none  &none                                      &none  &none          &snake_dir 0   &none           &none  &none
+&none  &anti_idle  &none  &none  &none  &none                                      &none  &snake_dir 3   &snake_dir 2   &snake_dir 1    &none  &none
 &none  &none       &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
               &none  &none  &none  &tog LOWER &none                 &none     &tog RAISE     &none  &none          &none
             >;
@@ -263,3 +263,52 @@
         time-to-max-speed-ms = <200>;
         acceleration-exponent = <0>;      /* linear scroll feel */
 };
+
+/* --------------------------------------------------------------------------
+ * NEXUS dongle control layer
+ *
+ * Compiled ONLY into the nexus_dongle build. CONFIG_NEXUS is set by the
+ * nexus_dongle shield and by nothing else, so the two halves, the settings
+ * reset build and the existing snake_dongle build never see any of this and
+ * are byte-for-byte unaffected. That is deliberate: Section 69 says NEXUS must
+ * not require redesigning a keymap that already works.
+ *
+ * It re-points the existing NAV_SNAKE layer rather than adding a layer, so the
+ * way you reach it does not change: hold LOWER+RAISE, or the 4+5 combo.
+ *
+ * The physical Action button on the dongle can pause, resume, restart and exit
+ * on its own, but one button cannot steer a falling tetromino - that is what
+ * these bindings are for. They emit the same logical verbs the button does
+ * (Section 13), so the game genuinely cannot tell a keycap from a finger.
+ *
+ *   I           rotate
+ *   J  K  L     left, soft drop, right
+ *   thumbs      hard drop
+ *   top-right   select: pause / resume / restart, by context
+ *   Q / W       home, game center
+ *   top-left    ZMK Studio unlock (Section 32)
+ * -------------------------------------------------------------------------- */
+#ifdef CONFIG_NEXUS
+
+#include <dt-bindings/nexus.h>
+
+/* Keeps the binding count identical whether or not Studio is built, so this
+ * layer never has two shapes to keep in sync. */
+#ifdef CONFIG_ZMK_STUDIO
+#define NEXUS_UNLOCK &studio_unlock
+#else
+#define NEXUS_UNLOCK &none
+#endif
+
+&{/keymap/nav_snake_layer} {
+    display-name = "nexus";
+    bindings = <
+NEXUS_UNLOCK  &none       &none  &none  &none  &none                                                                   &none  &none                          &none                            &none                           &none  &nexus_action NEXUS_ACT_SELECT
+&none         &nexus_action NEXUS_ACT_HOME  &nexus_action NEXUS_ACT_GAME_CENTER  &none  &none  &none                    &none  &none                          &nexus_action NEXUS_ACT_ROTATE   &none                           &none  &none
+&none         &anti_idle  &none  &none  &none  &none                                                                   &none  &nexus_action NEXUS_ACT_LEFT   &nexus_action NEXUS_ACT_DOWN     &nexus_action NEXUS_ACT_RIGHT   &none  &none
+&none         &none       &none  &none  &none  &none   &none                                                    &none  &none  &none                          &none                            &none                           &none  &none
+                          &none  &none  &none  &tog LOWER  &nexus_action NEXUS_ACT_DROP                 &nexus_action NEXUS_ACT_DROP  &tog RAISE  &none  &none  &none
+    >;
+};
+
+#endif /* CONFIG_NEXUS */

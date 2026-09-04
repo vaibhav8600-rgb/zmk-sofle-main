@@ -13,9 +13,31 @@ manifest:
       remote: zmkfirmware
       revision: main #ac7f75b8591d39aaf3b66b9d26f26c9ed921a009
       import: app/west.yml
+    # Required by EVERY build, not just snake_dongle. config/sofle.keymap
+    # declares snake_dir, anti_idle and dongle_action_behavior in its
+    # top-level behaviors node with this module's compatibles, and that keymap
+    # is compiled by both halves, settings_reset and the NEXUS dongle too.
+    # Removing this entry breaks the devicetree for all five artifacts, not
+    # only the Snake firmware.
+    #
+    # The NEXUS dongle build runs none of the Snake code: the forked ST7789
+    # driver is gated behind CONFIG_SHIELD_SNAKE_ADAPTER and the Snake UI
+    # lives in that shield's CMakeLists. What does come along is ~200 lines of
+    # behavior and event glue this module compiles unconditionally, of which
+    # anti_idle is the one worth having.
     - name: snake-module
       remote: vaibhav8600-rgb
-      revision: new-ui
+      revision: improvements
+    # NEXUS smart dongle platform. Only the nexus_dongle build compiles any of
+    # it - CMakeLists.txt returns early unless CONFIG_NEXUS is set - so the two
+    # halves and the existing snake dongle are unaffected by its presence here.
+    #
+    # Tracks main. The module's own CI builds it against ZMK main on every
+    # push, so a red badge there is the warning that this revision is about to
+    # break your keyboard - check it before bumping anything.
+    - name: nexus
+      remote: vaibhav8600-rgb
+      revision: main
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
       revision: main #new entry
