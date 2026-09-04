@@ -1,0 +1,49 @@
+/*
+ * ZMK Studio requirements for the NEXUS dongle build (Requirements S98).
+ *
+ * ZMK asserts this at compile time in app/src/physical_layouts.c:
+ *
+ *   #define USE_PHY_LAYOUTS (DT_HAS_COMPAT_STATUS_OKAY(zmk_physical_layout) \
+ *                            && !DT_HAS_CHOSEN(zmk_matrix_transform))
+ *   BUILD_ASSERT(!IS_ENABLED(CONFIG_ZMK_STUDIO) || USE_PHY_LAYOUTS, "ISSUE FOUND: ...")
+ *
+ * So a Studio build needs BOTH halves of that: a zmk,physical-layout node,
+ * and NO chosen zmk,matrix-transform. central_dongle.overlay provides neither
+ * - it predates Studio - so this file supplies the layout and removes the
+ * chosen property.
+ *
+ * WHY THIS FILE AND NOT central_dongle.overlay:
+ * ZMK picks exactly one overlay from the config directory, by shield name, and
+ * stops at the first match. For `central_dongle nexus_dongle` the candidates
+ * are sofle.overlay, nexus_dongle.overlay, central_dongle.overlay - so this
+ * file is used. For `central_dongle snake_adapter` it is not a candidate at
+ * all, so the Snake firmware keeps its matrix-transform and is completely
+ * unaffected. Studio is a NEXUS requirement, not a Snake one.
+ *
+ * ORDERING: ZMK appends the config-directory overlay after the shield
+ * overlays, so &default_transform (defined in central_dongle.overlay) is
+ * already in scope here, and the /delete-property/ below lands on a chosen
+ * node that already exists.
+ */
+
+/* Brings in josefadamcik_sofle_layout: ZMK's stock Sofle physical layout, 60
+ * keys - exactly matching central_dongle's 60-position matrix transform and
+ * the 60 bindings per layer in sofle.keymap. Also pulls physical_layouts.dtsi
+ * for &key_physical_attrs. */
+#include <layouts/josefadamcik/sofle.dtsi>
+
+/* Same transform the dongle already used; only the route to it changes. */
+&josefadamcik_sofle_layout {
+    transform = <&default_transform>;
+};
+
+/ {
+    chosen {
+        /*
+         * Studio manages the keymap through the physical layout, and refuses
+         * to build if a matrix transform is also chosen directly. The
+         * transform is not lost - it now hangs off the layout above.
+         */
+        /delete-property/ zmk,matrix-transform;
+    };
+};
