@@ -325,14 +325,39 @@
  * cannot read by eye is a keymap with a silent typo in it. Every alias here
  * fits one cell, so a column really is a key column.
  */
+/*
+ * Encoder -> theme, with no menu in the way.
+ *
+ * zmk,behavior-sensor-rotate-var takes two phandles (clockwise,
+ * counter-clockwise) and passes the two sensor params to them, so one node
+ * covers both directions of one encoder.
+ */
+/ {
+    behaviors {
+        nexus_theme_enc: nexus_theme_enc {
+            compatible = "zmk,behavior-sensor-rotate-var";
+            #sensor-binding-cells = <2>;
+            bindings = <&nexus_action>, <&nexus_action>;
+            tap-ms = <20>;
+        };
+    };
+};
+
+#define NX_THEME &nexus_theme_enc NEXUS_ACT_THEME_NEXT NEXUS_ACT_THEME_PREV
+#define NX_VOL   &inc_dec_kp C_VOL_UP C_VOL_DN
+
 #define NX_LOCK  &studio_unlock
+#define NX_MENU  &nexus_action NEXUS_ACT_MENU
+#define NX_SAVE  &nexus_action NEXUS_ACT_SAVE
 #define NX_HOME  &nexus_action NEXUS_ACT_HOME
 #define NX_GAME  &nexus_action NEXUS_ACT_GAME_CENTER
-#define NX_SEL   &nexus_action NEXUS_ACT_SELECT
 #define NX_BACK  &nexus_action NEXUS_ACT_BACK
+#define NX_UP    &nexus_action NEXUS_ACT_UP
+#define NX_DOWN  &nexus_action NEXUS_ACT_DOWN
+#define NX_ENT   &nexus_action NEXUS_ACT_SELECT
+#define NX_SEL   &nexus_action NEXUS_ACT_SELECT
 #define NX_ROT   &nexus_action NEXUS_ACT_ROTATE
 #define NX_LEFT  &nexus_action NEXUS_ACT_LEFT
-#define NX_DOWN  &nexus_action NEXUS_ACT_DOWN
 #define NX_RGT   &nexus_action NEXUS_ACT_RIGHT
 #define NX_DROP  &nexus_action NEXUS_ACT_DROP
 #define NX_JIG   &anti_idle
@@ -342,40 +367,54 @@
 &{/keymap/game_layer} {
     display-name = "GAME";
     /*
-     * GAME - the arrangement you get on a NEXUS dongle.
+     * GAME - everything the dongle's Action button can do, plus the things
+     * one button cannot.
      *
-     * Left hand drives the UI, right hand plays. The dongle's own Action
-     * button emits exactly these same logical verbs (Section 13), so NX_SEL
-     * and a tap on the dongle are indistinguishable to the game, and NX_BACK
-     * does what holding the dongle button does.
+     * LEFT drives the dongle UI, RIGHT plays the game. The button has to
+     * overload one gesture per screen; the keyboard does not, so navigating
+     * Settings is UP / DOWN / ENTER / BACK as separate keys instead of
+     * tap-to-move and hold-to-pick. SAVE has no button equivalent at all -
+     * from the button you have to walk to the SAVE row - so it is bound here
+     * and works from any screen.
      *
-     * Empty keys are &none, not &trans, and that is deliberate: GAME is a
-     * conditional layer over LOWER+RAISE, so &trans would fall through and
-     * type letters into whatever window has focus while you are playing.
-     * Masking is the whole point of a game layer.
+     * The verbs are context-sensitive by design (Section 13): ENTER picks a
+     * settings row and pauses a game, DOWN moves the cursor and soft-drops.
+     * The screen decides, not the key - which is why the same key can appear
+     * on both halves without meaning two things.
      *
+     * Empty keys are &none, not &trans: GAME is a conditional layer over
+     * LOWER+RAISE, so &trans would type letters into whatever has focus
+     * while you play. Masking is the point.
+     *
+     *          LEFT = dongle UI                          RIGHT = the game
      * ,------------------------------------------------.   ,------------------------------------------------.
-     * |Unlock| none | none | none | none | none        |   | none | none | none | none | none | PAUSE       |
-     * | none | HOME | GAMES| none | none | none        |   | none | none |ROTATE| none | none | none        |
-     * | none |AntiI | none | none | none | none        |   | none | LEFT | DOWN | RIGHT| none | none        |
-     * | BACK | none | none | none | none | none | none |   | none | none | none | none | none | none | none |
+     * |Unlock| MENU | SAVE | none | none | none        |   | none | none | none | none | none | PAUSE       |
+     * | BACK | HOME | GAMES|  UP  | none | none        |   | none | none |ROTATE| none | none | none        |
+     * | none |AntiI | none | DOWN |ENTER | none        |   | none | LEFT | DOWN | RIGHT| none | none        |
+     * | none | none | none | none | none | none | none |   | none | none | none | none | none | none | none |
      * `------------------------------+------+--------'    `------+-------+------------------------------'
-     *              | none | none | none |Lower | DROP  |   | DROP |Raise | none | none | none |
+     *              | none | none | none |Lower |ENTER  |   | DROP |Raise | none | none | none |
      *
-     *   Unlock  ZMK Studio unlock (top-left, where ` / Caps normally is)
-     *   HOME    back to the dashboard      GAMES  open the Game Center
-     *   PAUSE   pause / resume / restart, by context   (= a dongle tap)
-     *   BACK    leave the game                        (= a dongle hold)
-     *   I       rotate      J / K / L      left / soft drop / right
-     *   DROP    hard drop, on either inner thumb
+     *   Unlock ZMK Studio unlock     MENU  Settings      SAVE  persist settings
+     *   HOME   dashboard             GAMES Game Center   BACK  leave / go up
+     *   UP/DOWN move the cursor      ENTER pick a row, or pause a game
+     *   I rotate   J/K/L left, soft drop, right   DROP hard drop
      */
     bindings = <
-NX_LOCK     &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       NX_SEL
-&none       NX_HOME     NX_GAME     &none       &none       &none       &none       &none       NX_ROT      &none       &none       &none
-&none       NX_JIG      &none       &none       &none       &none       &none       NX_LEFT     NX_DOWN     NX_RGT      &none       &none
-NX_BACK     &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none
-                      &none       &none       &none       TOG_LWR     NX_DROP     NX_DROP     TOG_RSE     &none       &none       &none
+NX_LOCK     NX_MENU     NX_SAVE     &none       &none       &none       &none       &none       &none       &none       &none       NX_SEL
+NX_BACK     NX_HOME     NX_GAME     NX_UP       &none       &none       &none       &none       NX_ROT      &none       &none       &none
+&none       NX_JIG      &none       NX_DOWN     NX_ENT      &none       &none       NX_LEFT     NX_DOWN     NX_RGT      &none       &none
+&none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none
+                      &none       &none       &none       TOG_LWR     NX_ENT      NX_DROP     TOG_RSE     &none       &none       &none
     >;
+
+    /*
+     * Left encoder cycles the theme, right encoder keeps volume - still worth
+     * having with a game up. The theme applies on the detent and saves itself
+     * a few seconds after you stop turning, so no menu trip and no flash write
+     * per click. Swap NX_VOL for a brightness pair if you would rather.
+     */
+    sensor-bindings = <NX_THEME NX_VOL>;
 };
 
 #endif /* NEXUS_DONGLE */
