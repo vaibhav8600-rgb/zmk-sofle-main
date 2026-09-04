@@ -21,7 +21,7 @@
 #define BASE 0
 #define LOWER 1
 #define RAISE 2
-#define NAV_SNAKE 3
+#define GAME 3
 
 / {
     /* ----------------------------------------------------------------------
@@ -54,12 +54,12 @@
         bindings = <&mo RAISE>, <&tog RAISE>;
     };
 
-    /* Activate NAV_SNAKE layer when LOWER and RAISE are both active. */
+    /* Activate the GAME layer when LOWER and RAISE are both held. */
     conditional_layers {
         compatible = "zmk,conditional-layers";
-        snake_layer {
+        game_layer {
             if-layers = <LOWER RAISE>;
-            then-layer = <NAV_SNAKE>;
+            then-layer = <GAME>;
         };
     };
 
@@ -84,15 +84,15 @@
             bindings = <&kp LC(A)>;
         };
 
-        combo_snake_toggle {
+        combo_game_toggle {
             /*
-            * 4 + 5 (left-hand number row, positions 4 & 5)
-            * Toggle into / out-of Snake Mode layer
-            */
+             * 4 + 5 (left-hand number row) toggles the GAME layer, so you can
+             * stay in it without holding LOWER+RAISE while you play.
+             */
             timeout-ms = <80>;
             key-positions = <4 5>;  // number-row 4 + 5
-            layers = <BASE NAV_SNAKE>;
-            bindings = <&tog NAV_SNAKE>;
+            layers = <BASE GAME>;
+            bindings = <&tog GAME>;
         };
 
     };
@@ -209,38 +209,50 @@
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_UP SCRL_DOWN>;
         };
 
-        nav_snake_layer {
-            display-name = "snake";
+        game_layer {
+            display-name = "GAME";
             /*
-             * SNAKE
-             * All keys are masked except I/J/K/L direction controls and the
-             * dongle action key. Combo 4+5 toggles this layer on and off.
+             * GAME - dongle UI control layer.
              *
-             * The A key toggles anti-idle: press once = on (cursor twitches
-             * shortly after as confirmation), press again = off. Runs until
-             * toggled off, even after leaving this layer.
+             * Reached by holding LOWER+RAISE, or latched with the 4+5 combo so
+             * you can play without holding anything.
              *
-             * Directions are plain screen directions now - the renderer owns
-             * panel rotation (CONFIG_ROTATE_DISPLAY), so no compensation:
-             *   0 = UP    (I)
-             *   1 = RIGHT (L)
-             *   2 = DOWN  (K)
-             *   3 = LEFT  (J)
+             * These are the FALLBACK bindings, used only by a firmware built
+             * WITHOUT the nexus_dongle shield. On a NEXUS build the whole
+             * layer is replaced at the bottom of this file - see the
+             * #ifdef NEXUS_DONGLE block for the arrangement you actually get.
+             *
+             * The Snake direction keys that used to live here are commented
+             * out below rather than deleted: they only do something in the
+             * snake_dongle firmware, and leaving live &snake_dir bindings on a
+             * layer now named GAME was more confusing than useful. Restore
+             * them if you go back to that firmware.
+             *
+             * A still toggles anti-idle (the mouse jiggler): press once = on,
+             * press again = off. It keeps running after you leave this layer.
              *
              * ,-----------------------------------------------.   ,-----------------------------------------------.
-             * | none  | none | none | none | none | none      |   | none | none | none | none | none | action   |
-             * | none  | none | none | none | none | none      |   | none | none | Up   | none | none | none     |
-             * | none  |AntiI | none | none | none | none      |   | none | Left | Down | Right| none | none     |
-             * | none  | none | none | none | none | none|none |   |none | none | none | none | none |none |none |
+             * | none  | none | none | none | none | none      |   | none | none | none | none | none | none     |
+             * | none  | none | none | none | none | none      |   | none | none | none | none | none | none     |
+             * | none  |AntiI | none | none | none | none      |   | none | none | none | none | none | none     |
+             * | none  | none | none | none | none | none|none |   | none | none | none | none | none |none|none |
              * `-----------------------------+------+-------'   `------+-------+-----------------------------'
+             *              | none | none | none |Lower | none |   | none |Raise | none | none | none |
              */
             bindings = <
-&none  &none       &none  &none  &none  &none                                      &none  &none          &none          &none           &none  &dongle_action_behavior
-&none  &none       &none  &none  &none  &none                                      &none  &none          &snake_dir 0   &none           &none  &none
-&none  &anti_idle  &none  &none  &none  &none                                      &none  &snake_dir 3   &snake_dir 2   &snake_dir 1    &none  &none
-&none  &none       &none  &none  &none  &none   &none                    &none     &none  &none          &none          &none           &none  &none
-              &none  &none  &none  &tog LOWER &none                 &none     &tog RAISE     &none  &none          &none
+&none  &none       &none  &none  &none  &none                        &none  &none  &none  &none  &none  &none
+&none  &none       &none  &none  &none  &none                        &none  &none  &none  &none  &none  &none
+&none  &anti_idle  &none  &none  &none  &none                        &none  &none  &none  &none  &none  &none
+&none  &none       &none  &none  &none  &none   &none        &none   &none  &none  &none  &none  &none  &none
+              &none  &none  &none  &tog LOWER  &none       &none  &tog RAISE  &none  &none  &none
             >;
+            /* Snake firmware bindings, kept for reference:
+             *   row 0 col 11 : &dongle_action_behavior
+             *   row 1 col  8 : &snake_dir 0      (I - up)
+             *   row 2 col  7 : &snake_dir 3      (J - left)
+             *   row 2 col  8 : &snake_dir 2      (K - down)
+             *   row 2 col  9 : &snake_dir 1      (L - right)
+             */
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_UP SCRL_DOWN>;
         };
@@ -273,7 +285,7 @@
  * are byte-for-byte unaffected. That is deliberate: Section 69 says NEXUS must
  * not require redesigning a keymap that already works.
  *
- * It re-points the existing NAV_SNAKE layer rather than adding a layer, so the
+ * It re-points the existing GAME layer rather than adding one, so the
  * way you reach it does not change: hold LOWER+RAISE, or the 4+5 combo.
  *
  * The physical Action button on the dongle can pause, resume, restart and exit
@@ -288,27 +300,82 @@
  *   Q / W       home, game center
  *   top-left    ZMK Studio unlock (Section 32)
  * -------------------------------------------------------------------------- */
-#ifdef CONFIG_NEXUS
+/*
+ * NEXUS_DONGLE, not CONFIG_NEXUS. Zephyr builds the devicetree before it runs
+ * Kconfig, so autoconf.h does not exist while this file is preprocessed and
+ * any `#ifdef CONFIG_...` here is silently false - which is exactly how this
+ * whole block failed to compile the first time, leaving the old &snake_dir and
+ * &dongle_action_behavior bindings live on a NEXUS build.
+ *
+ * NEXUS_DONGLE is defined by the nexus_dongle shield overlay, which Zephyr
+ * concatenates ahead of this file.
+ */
+#ifdef NEXUS_DONGLE
 
 #include <dt-bindings/nexus.h>
 
 /* Keeps the binding count identical whether or not Studio is built, so this
  * layer never has two shapes to keep in sync. */
-#ifdef CONFIG_ZMK_STUDIO
-#define NEXUS_UNLOCK &studio_unlock
-#else
-#define NEXUS_UNLOCK &none
-#endif
 
-&{/keymap/nav_snake_layer} {
-    display-name = "nexus";
+/*
+ * Short aliases so the grid below is actually a grid.
+ *
+ * `&nexus_action NEXUS_ACT_GAME_CENTER` is 35 characters and `&none` is 5;
+ * mixing them in one table makes the columns meaningless, and a keymap you
+ * cannot read by eye is a keymap with a silent typo in it. Every alias here
+ * fits one cell, so a column really is a key column.
+ */
+#define NX_LOCK  &studio_unlock
+#define NX_HOME  &nexus_action NEXUS_ACT_HOME
+#define NX_GAME  &nexus_action NEXUS_ACT_GAME_CENTER
+#define NX_SEL   &nexus_action NEXUS_ACT_SELECT
+#define NX_BACK  &nexus_action NEXUS_ACT_BACK
+#define NX_ROT   &nexus_action NEXUS_ACT_ROTATE
+#define NX_LEFT  &nexus_action NEXUS_ACT_LEFT
+#define NX_DOWN  &nexus_action NEXUS_ACT_DOWN
+#define NX_RGT   &nexus_action NEXUS_ACT_RIGHT
+#define NX_DROP  &nexus_action NEXUS_ACT_DROP
+#define NX_JIG   &anti_idle
+#define TOG_LWR  &tog LOWER
+#define TOG_RSE  &tog RAISE
+
+&{/keymap/game_layer} {
+    display-name = "GAME";
+    /*
+     * GAME - the arrangement you get on a NEXUS dongle.
+     *
+     * Left hand drives the UI, right hand plays. The dongle's own Action
+     * button emits exactly these same logical verbs (Section 13), so NX_SEL
+     * and a tap on the dongle are indistinguishable to the game, and NX_BACK
+     * does what holding the dongle button does.
+     *
+     * Empty keys are &none, not &trans, and that is deliberate: GAME is a
+     * conditional layer over LOWER+RAISE, so &trans would fall through and
+     * type letters into whatever window has focus while you are playing.
+     * Masking is the whole point of a game layer.
+     *
+     * ,------------------------------------------------.   ,------------------------------------------------.
+     * |Unlock| none | none | none | none | none        |   | none | none | none | none | none | PAUSE       |
+     * | none | HOME | GAMES| none | none | none        |   | none | none |ROTATE| none | none | none        |
+     * | none |AntiI | none | none | none | none        |   | none | LEFT | DOWN | RIGHT| none | none        |
+     * | BACK | none | none | none | none | none | none |   | none | none | none | none | none | none | none |
+     * `------------------------------+------+--------'    `------+-------+------------------------------'
+     *              | none | none | none |Lower | DROP  |   | DROP |Raise | none | none | none |
+     *
+     *   Unlock  ZMK Studio unlock (top-left, where ` / Caps normally is)
+     *   HOME    back to the dashboard      GAMES  open the Game Center
+     *   PAUSE   pause / resume / restart, by context   (= a dongle tap)
+     *   BACK    leave the game                        (= a dongle hold)
+     *   I       rotate      J / K / L      left / soft drop / right
+     *   DROP    hard drop, on either inner thumb
+     */
     bindings = <
-NEXUS_UNLOCK  &none       &none  &none  &none  &none                                                                   &none  &none                          &none                            &none                           &none  &nexus_action NEXUS_ACT_SELECT
-&none         &nexus_action NEXUS_ACT_HOME  &nexus_action NEXUS_ACT_GAME_CENTER  &none  &none  &none                    &none  &none                          &nexus_action NEXUS_ACT_ROTATE   &none                           &none  &none
-&none         &anti_idle  &none  &none  &none  &none                                                                   &none  &nexus_action NEXUS_ACT_LEFT   &nexus_action NEXUS_ACT_DOWN     &nexus_action NEXUS_ACT_RIGHT   &none  &none
-&none         &none       &none  &none  &none  &none   &none                                                    &none  &none  &none                          &none                            &none                           &none  &none
-                          &none  &none  &none  &tog LOWER  &nexus_action NEXUS_ACT_DROP                 &nexus_action NEXUS_ACT_DROP  &tog RAISE  &none  &none  &none
+NX_LOCK     &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       NX_SEL
+&none       NX_HOME     NX_GAME     &none       &none       &none       &none       &none       NX_ROT      &none       &none       &none
+&none       NX_JIG      &none       &none       &none       &none       &none       NX_LEFT     NX_DOWN     NX_RGT      &none       &none
+NX_BACK     &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none       &none
+                      &none       &none       &none       TOG_LWR     NX_DROP     NX_DROP     TOG_RSE     &none       &none       &none
     >;
 };
 
-#endif /* CONFIG_NEXUS */
+#endif /* NEXUS_DONGLE */
