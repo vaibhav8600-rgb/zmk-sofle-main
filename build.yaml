@@ -23,10 +23,43 @@ include:
   # This entry is the first thing to build central_dongle + nexus_dongle
   # together, so if anything here fails it is config-level - the module's C
   # code is already proven green upstream.
+  #
+  # Studio is a NEXUS requirement (Sections 30-32), so it stays on here.
+  # CONFIG_ZMK_STUDIO=y lives in config/nexus_dongle.conf; this snippet is the
+  # transport it needs.
   - board: nice_nano@2.0.0//zmk
     shield: central_dongle nexus_dongle
     snippet: studio-rpc-usb-uart
     artifact-name: nexus_dongle
+
+  # --- NEXUS dongle, Studio removed. Diagnostic build only. ---------------
+  # Flash this ONLY if nexus_dongle still will not advertise over BLE. It is
+  # the identical firmware with the one remaining variable taken out, so the
+  # answer it gives is unambiguous:
+  #
+  #   BLE works here but not on nexus_dongle -> Studio is the cause, and the
+  #     next step is sizing CONFIG_HEAP_MEM_POOL_SIZE rather than guessing
+  #   BLE fails on both -> Studio is exonerated, and the serial log from
+  #     either build says what update_advertising() actually did
+  #
+  # Studio is switched off with a cmake arg rather than a second .conf,
+  # because ZMK resolves .conf files by shield name and both of these use the
+  # same shield - a second file would apply to both and prove nothing.
+  #
+  # The arg does take effect, which is worth stating because Zephyr's
+  # precedence is not what you would assume: command-line CONFIG_ values are
+  # merged AFTER shield configs but BEFORE an application-directory .conf. ZMK
+  # appends everything under ZMK_CONFIG to shield_conf_files
+  # (app/boards/post_boards_shields.cmake), so nexus_dongle.conf lands in the
+  # shield group and the command line overrides it. Had ZMK used the
+  # application slot instead, this entry would silently build with Studio
+  # still on and tell us nothing.
+  #
+  # Delete this entry once BLE is confirmed working.
+  - board: nice_nano@2.0.0//zmk
+    shield: central_dongle nexus_dongle
+    cmake-args: -DCONFIG_ZMK_STUDIO=n
+    artifact-name: nexus_dongle_diag_nostudio
 
   # --- Halves. Neither compiles a single line of NEXUS. --------------------
   - board: nice_nano@2.0.0//zmk
