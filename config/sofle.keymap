@@ -222,11 +222,14 @@
              * layer is replaced at the bottom of this file - see the
              * #ifdef NEXUS_DONGLE block for the arrangement you actually get.
              *
-             * The Snake direction keys that used to live here are commented
-             * out below rather than deleted: they only do something in the
-             * snake_dongle firmware, and leaving live &snake_dir bindings on a
-             * layer now named GAME was more confusing than useful. Restore
-             * them if you go back to that firmware.
+             * This grid is a fallback. The NEXUS build replaces the whole
+             * layer at the bottom of this file (#ifdef NEXUS_DONGLE); any
+             * other firmware built from this branch gets these keys.
+             *
+             * There are deliberately no &snake_dir bindings here. The snake
+             * dongle lives on its own branch now, so carrying a second set of
+             * game controls this branch never uses would just be a layer that
+             * has to be kept in sync with a firmware nobody builds here.
              *
              * A still toggles anti-idle (the mouse jiggler): press once = on,
              * press again = off. It keeps running after you leave this layer.
@@ -246,14 +249,6 @@
 &none  &none       &none  &none  &none  &none   &none        &none   &none  &none  &none  &none  &none  &none
               &none  &none  &none  &tog LOWER  &none       &none  &tog RAISE  &none  &none  &none
             >;
-            /* Snake firmware bindings, kept for reference:
-             *   row 0 col 11 : &dongle_action_behavior
-             *   row 1 col  8 : &snake_dir 0      (I - up)
-             *   row 2 col  7 : &snake_dir 3      (J - left)
-             *   row 2 col  8 : &snake_dir 2      (K - down)
-             *   row 2 col  9 : &snake_dir 1      (L - right)
-             */
-
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_msc SCRL_UP SCRL_DOWN>;
         };
 
