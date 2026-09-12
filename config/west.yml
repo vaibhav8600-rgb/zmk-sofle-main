@@ -42,7 +42,7 @@ manifest:
     # keyboard - check it before bumping anything.
     - name: nexus
       remote: vaibhav8600-rgb
-      revision: feature/invaders-hold-fire
+      revision: main
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
       revision: main #new entry
