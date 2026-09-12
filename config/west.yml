@@ -32,12 +32,17 @@ manifest:
     # it - CMakeLists.txt returns early unless CONFIG_NEXUS is set - so the two
     # halves and the existing snake dongle are unaffected by its presence here.
     #
-    # Tracks main. The module's own CI builds it against ZMK main on every
-    # push, so a red badge there is the warning that this revision is about to
-    # break your keyboard - check it before bumping anything.
+    # TEMPORARILY on feature/new-games, to validate Pac-Man and the platformer
+    # on hardware before they are merged. Put this back to `main` the moment
+    # that PR lands - a config repo left pointing at a feature branch is a
+    # build that silently stops tracking releases.
+    #
+    # The module's own CI builds it against ZMK main on every push, so a red
+    # badge there is the warning that this revision is about to break your
+    # keyboard - check it before bumping anything.
     - name: nexus
       remote: vaibhav8600-rgb
-      revision: main
+      revision: feature/invaders-hold-fire
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
       revision: main #new entry
