@@ -37,6 +37,23 @@
     transform = <&default_transform>;
 };
 
+/*
+ * A second USB serial, for the NEXUS host companion (CONFIG_NEXUS_HOST_LINK).
+ *
+ * This lives here rather than in the NEXUS module on purpose. A module that
+ * referenced &zephyr_udc0 would fail to build for anyone whose board does not
+ * define it, and an extra serial port appearing on your PC should be
+ * something you opted into rather than something a firmware update did to you.
+ *
+ * ZMK Studio's CDC port is a separate interface on the same composite device
+ * and is unaffected; both can be open at once.
+ */
+&zephyr_udc0 {
+    nexus_host_cdc: nexus_host_cdc {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};
+
 / {
     chosen {
         /*
