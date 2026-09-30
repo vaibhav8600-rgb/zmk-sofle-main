@@ -37,7 +37,9 @@ manifest:
     # keyboard - check it before bumping anything.
     - name: nexus
       remote: vaibhav8600-rgb
-      revision: feature/idle-blanking-and-host-link
+      # Remote Input (phone as keyboard and mouse) is still on its PR branch.
+      # Back to main once that PR is merged.
+      revision: feature/remote-input
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
       revision: main #new entry
