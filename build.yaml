@@ -32,17 +32,6 @@ include:
     snippet: studio-rpc-usb-uart
     artifact-name: nexus_dongle
 
-  # TEMPORARY, for the blank-screen report after Remote Input: the same
-  # firmware with Remote Input switched off. If nexus_dongle is still blank
-  # and this one boots, the fault is in Remote Input; if this one is blank
-  # too, it is not - it came in with the ZMK main the build pulled. Delete
-  # this entry once the dongle is back.
-  - board: nice_nano@2.0.0//zmk
-    shield: central_dongle nexus_dongle
-    snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_NEXUS_REMOTE_INPUT=n
-    artifact-name: nexus_dongle_no_remote
-
   # --- Halves. Neither compiles a single line of NEXUS. --------------------
   - board: nice_nano@2.0.0//zmk
     shield: sofle_left_peripheral nice_view_adapter nice_view_gem
