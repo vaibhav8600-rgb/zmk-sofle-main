@@ -43,23 +43,38 @@ include:
     cmake-args: -DCONFIG_NEXUS_REMOTE_INPUT=n
     artifact-name: nexus_dongle_no_remote
 
-  # TEMPORARY, same report. Remote Input's code stays out, but the Bluetooth
-  # settings it switches on go in: extended advertising, a second identity,
-  # GATT authorization, the bigger main stack. Blank = ZMK/Zephyr cannot boot
-  # with extended advertising on this board, and Remote Input's own code is
-  # not the cause. Boots = the cause is in Remote Input's code.
+  # TEMPORARY, same report. nexus_dongle_extadv_only (all four Bluetooth
+  # settings Remote Input switches on, none of its code) froze before USB came
+  # up, so the freeze is in Bluetooth start-up. One setting per firmware, to
+  # find which; flash each, note black or boots.
   - board: nice_nano@2.0.0//zmk
     shield: central_dongle nexus_dongle
     snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_NEXUS_REMOTE_INPUT=n -DCONFIG_BT_EXT_ADV=y -DCONFIG_BT_EXT_ADV_MAX_ADV_SET=2 -DCONFIG_BT_ID_MAX=2 -DCONFIG_BT_GATT_AUTHORIZATION_CUSTOM=y -DCONFIG_MAIN_STACK_SIZE=2048
-    artifact-name: nexus_dongle_extadv_only
-
-  # TEMPORARY, same report. Full Remote Input, plus a USB serial port that
-  # prints the boot log - ZMK's own zmk-usb-logging snippet, alongside
-  # Studio's. Open the new COM port at 115200 (PuTTY) right after plugging in.
+    cmake-args: -DCONFIG_NEXUS_REMOTE_INPUT=n -DCONFIG_BT_EXT_ADV=y -DCONFIG_BT_EXT_ADV_MAX_ADV_SET=2
+    artifact-name: nexus_test1_extadv
   - board: nice_nano@2.0.0//zmk
     shield: central_dongle nexus_dongle
-    cmake-args: -DSNIPPET='studio-rpc-usb-uart;zmk-usb-logging' -DCONFIG_ZMK_USB_LOGGING=y -DCONFIG_NEXUS_LOG_LEVEL_DBG=y -DCONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS=4000 -DCONFIG_LOG_BUFFER_SIZE=4096
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_NEXUS_REMOTE_INPUT=n -DCONFIG_BT_ID_MAX=2
+    artifact-name: nexus_test2_identity
+  - board: nice_nano@2.0.0//zmk
+    shield: central_dongle nexus_dongle
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_NEXUS_REMOTE_INPUT=n -DCONFIG_BT_GATT_AUTHORIZATION_CUSTOM=y
+    artifact-name: nexus_test3_authz
+  - board: nice_nano@2.0.0//zmk
+    shield: central_dongle nexus_dongle
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_NEXUS_REMOTE_INPUT=n -DCONFIG_MAIN_STACK_SIZE=2048
+    artifact-name: nexus_test4_stack
+
+  # TEMPORARY, same report. Full Remote Input plus a USB serial boot log, with
+  # Bluetooth started AFTER USB (priority 97 instead of 50), so the log port
+  # exists before the freeze and can show it. Open the new COM port at 115200
+  # in PuTTY as soon as it appears.
+  - board: nice_nano@2.0.0//zmk
+    shield: central_dongle nexus_dongle
+    cmake-args: -DSNIPPET='studio-rpc-usb-uart;zmk-usb-logging' -DCONFIG_ZMK_USB_LOGGING=y -DCONFIG_ZMK_BLE_INIT_PRIORITY=97 -DCONFIG_NEXUS_LOG_LEVEL_DBG=y -DCONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS=4000 -DCONFIG_LOG_BUFFER_SIZE=4096
     artifact-name: nexus_dongle_debug_log
 
   # --- Halves. Neither compiles a single line of NEXUS. --------------------
