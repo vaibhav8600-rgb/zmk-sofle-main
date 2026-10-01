@@ -39,7 +39,7 @@ manifest:
       remote: vaibhav8600-rgb
       # Remote Input (phone as keyboard and mouse) is still on its PR branch.
       # Back to main once that PR is merged.
-      revision: feature/remote-input
+      revision: main
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
       revision: main #new entry
