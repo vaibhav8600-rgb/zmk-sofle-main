@@ -260,11 +260,13 @@ Remote Input:     on; BT_MAX_CONN=8, BT_MAX_PAIRED=9 for the phones
 
 Use a phone as keyboard, trackpad, media remote and NEXUS controller - nothing installed on the computer, which just sees the same USB keyboard and mouse.
 
-1. On the dongle: **Settings > PHONE** opens a 60-second pairing window.
+1. On the dongle: **Settings > PHONE > PAIR** opens a 60-second pairing window.
 2. Open the app - [nexus-remote-seven.vercel.app](https://nexus-remote-seven.vercel.app) - in **Bluefy** on iPhone (Safari has no Web Bluetooth) or Chrome on Android, and tap **Connect to NEXUS**.
 3. Type the six digits the dongle shows.
 
-After that, **Connect to NEXUS** brings the phone back with no code - also while a laptop is connected over BLE. Android pairing is still experimental. Details: [Remote Input](https://github.com/vaibhav8600-rgb/nexus/blob/main/docs/remote-input.md); app source: [nexus-remote](https://github.com/vaibhav8600-rgb/nexus-remote).
+After that, **Connect to NEXUS** brings the phone back with no code - also while a laptop is connected over BLE. Android pairing is still experimental. The same **Settings > PHONE** list switches phone input on and off (**REMOTE**) and forgets paired phones (**FORGET**, press twice).
+
+Beyond the trackpad and keyboard, the app runs presentations (Next/Previous, a talk timer, an air pointer - hold the phone upright and point), pastes the phone's clipboard, keeps text snippets, and shows both halves' batteries. Details: [Remote Input](https://github.com/vaibhav8600-rgb/nexus/blob/main/docs/remote-input.md); app source: [nexus-remote](https://github.com/vaibhav8600-rgb/nexus-remote).
 
 ### HOST screen
 
@@ -404,8 +406,8 @@ Switching between the two dongle firmwares: flash `settings_reset` to the dongle
 - **Wrong half sends wrong columns:** the left half takes `sofle_left_peripheral`, the right `sofle_right`.
 - **A Bluetooth host will not pair:** RAISE `BT_CLR` (or `BT_CLR_ALL`), then pair again from the host.
 - **Anything else on NEXUS** - display, sound, split, Studio, HOST: the NEXUS repo's [troubleshooting](https://github.com/vaibhav8600-rgb/nexus/blob/main/docs/troubleshooting.md).
-- **The phone will not pair with NEXUS:** forget NEXUS in the phone's Bluetooth settings first, then Settings > PHONE on the dongle and Connect within the minute.
-- **The NEXUS app cannot find the dongle:** on iPhone, use Bluefy, not Safari. A phone that has never paired needs Settings > PHONE first.
+- **The phone will not pair with NEXUS:** forget NEXUS in the phone's Bluetooth settings first, then Settings > PHONE > PAIR on the dongle and Connect within the minute. A phone that forgot NEXUS gets **OLD PAIRING CLEARED, TAP CONNECT AGAIN** once - tap Connect again.
+- **The NEXUS app cannot find the dongle:** on iPhone, use Bluefy, not Safari. A phone that has never paired needs Settings > PHONE > PAIR first.
 - **HOST screen says NO LINK:** the PC companion is not running - see [HOST screen](#host-screen).
 - **The NEXUS dashboard blanks while you are still around:** blanking counts from the last key on either half; raise `CONFIG_NEXUS_BACKLIGHT_TIMEOUT_S`.
 - **Encoders do nothing:** check the right half firmware is flashed and EC11 is enabled in `config/sofle.conf`.
