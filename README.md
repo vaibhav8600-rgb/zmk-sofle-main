@@ -14,41 +14,52 @@
 </p>
 
 <p align="center">
-  A custom dongle-central Sofle firmware named <strong>Snake</strong>, built on ZMK with two wireless halves, a dedicated nice!nano central dongle, a themed ST7789 display experience, pointer controls, encoder support, Windows workflow shortcuts, and an integrated snake game module.
+  A dongle-central Sofle on ZMK: two wireless halves with nice!view displays, and a nice!nano dongle with a colour ST7789 screen that runs one of two firmwares - <strong>NEXUS</strong>, a smart dongle with a dashboard, games, a PC companion, ZMK Studio and phone control, or the original <strong>Snake</strong> dongle.
 </p>
 
 ---
 
 ## Table Of Contents
 
-- [What Makes This Build Special](#what-makes-this-build-special)
+- [Two Dongle Firmwares](#two-dongle-firmwares)
 - [System Architecture](#system-architecture)
 - [Build Artifacts](#build-artifacts)
 - [Hardware Profile](#hardware-profile)
 - [Keymap](#keymap)
-- [Snake Layer](#snake-layer)
-- [Snake And Display Experience](#snake-and-display-experience)
+- [GAME Layer](#game-layer)
+- [NEXUS Dongle](#nexus-dongle)
+- [Snake Dongle](#snake-dongle)
 - [Flashing Guide](#flashing-guide)
 - [Pairing And Reset Flow](#pairing-and-reset-flow)
 - [Repository Map](#repository-map)
 - [Customization Guide](#customization-guide)
 - [Troubleshooting](#troubleshooting)
 - [Wiring Reference](#wiring-reference)
+- [Credits](#credits)
 
 ---
 
-## What Makes This Build Special
+## Two Dongle Firmwares
 
-- Dedicated dongle-central split BLE topology using `central_dongle`.
-- Separate firmware artifacts for dongle, left half, right half, and settings reset.
-- Four real layers only: `BASE`, `LOWER`, `RAISE`, and `NAV_SNAKE`.
-- No `ADJUST` layer is defined in this keymap.
-- `NAV_SNAKE` is a real playable snake control layer, not a placeholder.
-- Dongle-side ST7789V snake/status UI with custom splash art, colors, sounds, WPM, layer, connectivity, modifiers, and battery data.
-- Both peripherals use nice!view e-paper displays through `nice_view_adapter nice_view_gem`.
-- EC11 encoders, pointer movement, mouse buttons, scrolling, output switching, Bluetooth profile controls, combos, and Windows workflow shortcuts.
-- Anti-idle mouse jiggler: toggle humanized cursor micro-movements from the snake layer to keep the host awake, with a green status dot on the dongle display.
-- Deep sleep, boosted BLE TX power, and central battery fetching are enabled.
+The same dongle hardware runs either firmware. Flash **one** of them; the halves are the same for both.
+
+| | `nexus_dongle` (recommended) | `snake_dongle` |
+| --- | --- | --- |
+| Module | [nexus](https://github.com/vaibhav8600-rgb/nexus) | [snake-module](https://github.com/vaibhav8600-rgb/snake-module) |
+| Screen | Dashboard: links, layer, modifiers, WPM, both batteries | Snake game and status slots |
+| Games | Tetris, Snake, Breakout, Pac-Man, Jumper, Invaders, Pong, from a Game Center | Snake |
+| Controls | Dongle button plus the GAME layer | Dongle screen and menu (no keyboard steering in this keymap) |
+| Extras | Themes, custom splash, HOST screen (PC clock and stats), ZMK Studio over USB, phone remote | Splash art, themes, sounds |
+| Bluetooth name | `NEXUS` | `Snake` |
+
+<p align="center">
+  <img src="https://github.com/vaibhav8600-rgb/nexus/raw/main/docs/images/screens/home.png" alt="NEXUS home dashboard" width="24%">
+  <img src="https://github.com/vaibhav8600-rgb/nexus/raw/main/docs/images/screens/game-center.png" alt="NEXUS Game Center" width="24%">
+  <img src="https://github.com/vaibhav8600-rgb/nexus/raw/main/docs/images/screens/host.png" alt="NEXUS HOST screen" width="24%">
+  <img src="https://github.com/vaibhav8600-rgb/nexus/raw/main/docs/images/screens/remote-passkey.png" alt="NEXUS pairing a phone" width="24%">
+</p>
+
+Both builds share the anti-idle mouse jiggler, deep sleep on the halves, boosted BLE TX power and central battery fetching.
 
 ---
 
@@ -59,8 +70,8 @@
                           |
                           v
                 nice!nano central dongle
-              shield: central_dongle snake_adapter
-              display: ST7789V + custom snake/status UI
+      shield: central_dongle nexus_dongle   (or central_dongle snake_adapter)
+      display: ST7789V 240x240
                     /                         \
                    / BLE split links           \
                   v                             v
@@ -68,13 +79,13 @@
       shield: sofle_left_peripheral      shield: sofle_right
       display: nice!view e-paper         display: nice!view e-paper
       encoder: left EC11                 encoder: right EC11
+
+      phone (NEXUS Remote app) --BLE--> dongle      NEXUS only
 ```
 
-Why this layout matters:
-
-- The dongle handles the central split role, host connection, display logic, snake module UI, and battery fetching for both peripherals.
-- The keyboard halves stay focused on scanning keys, encoders, and split BLE communication.
-- The build produces independent firmware images so each physical device gets exactly the shield stack it needs.
+- The dongle is the split central: it talks to the host over USB or BLE, runs the display, and fetches both halves' batteries.
+- The halves only scan keys and encoders and send them to the dongle.
+- With NEXUS and Remote Input, a phone also connects to the dongle and its input goes out through the same USB keyboard and mouse.
 
 ---
 
@@ -83,28 +94,36 @@ Why this layout matters:
 The firmware matrix is defined in [`build.yaml`](build.yaml).
 
 ```text
+nexus_dongle
+  Board:   nice_nano@2.0.0//zmk
+  Shield:  central_dongle nexus_dongle
+  Snippet: studio-rpc-usb-uart      (ZMK Studio over USB)
+  Flash:   the dongle - OR snake_dongle, never both
+
 snake_dongle
-  Board:  nice_nano@2.0.0//zmk
-  Shield: central_dongle snake_adapter
-  Flash:  dedicated nice!nano dongle
+  Board:   nice_nano@2.0.0//zmk
+  Shield:  central_dongle snake_adapter
+  Flash:   the dongle - OR nexus_dongle
 
 sofle_left_peripheral
-  Board:  nice_nano@2.0.0//zmk
-  Shield: sofle_left_peripheral nice_view_adapter nice_view_gem
-  Flash:  left Sofle half
+  Board:   nice_nano@2.0.0//zmk
+  Shield:  sofle_left_peripheral nice_view_adapter nice_view_gem
+  Flash:   left Sofle half
 
 sofle_right
-  Board:  nice_nano@2.0.0//zmk
-  Shield: sofle_right nice_view_adapter nice_view_gem
-  Flash:  right Sofle half
+  Board:   nice_nano@2.0.0//zmk
+  Shield:  sofle_right nice_view_adapter nice_view_gem
+  Flash:   right Sofle half
 
 settings_reset
-  Board:  nice_nano@2.0.0//zmk
-  Shield: settings_reset
-  Flash:  any controller that needs BLE/settings reset
+  Board:   nice_nano@2.0.0//zmk
+  Shield:  settings_reset
+  Flash:   any controller that needs its BLE pairings and settings wiped
 ```
 
-The workflow in [`.github/workflows/build.yml`](.github/workflows/build.yml) runs ZMK's reusable user-config build on pushes, pull requests, and manual dispatch.
+The halves and `settings_reset` compile no NEXUS code: the NEXUS module only builds when the `nexus_dongle` shield is in the stack.
+
+The workflow in [`.github/workflows/build.yml`](.github/workflows/build.yml) runs ZMK's reusable user-config build on pushes, pull requests and manual dispatch.
 
 ---
 
@@ -113,53 +132,45 @@ The workflow in [`.github/workflows/build.yml`](.github/workflows/build.yml) run
 ```text
 Keyboard:       Sofle split keyboard layout
 Controllers:    nice!nano v2.0.0 for dongle and halves
-Dongle display: ST7789V color display, rotated 90 degrees
+Dongle display: ST7789V 240x240 colour, mounted upside down
+                (NEXUS turns it 180 in software; Snake rotates 90)
+Dongle extras:  passive buzzer (P0.29), action button (NEXUS)
 Half displays:  nice!view e-paper via nice-view-gem
-Encoders:       dual EC11 support
+Encoders:       dual EC11
 Matrix:         5 rows, 12 logical full-layout columns, col2row diodes
 Underglow:      WS2812 SPI overlay provision, 10 LED chain length
-Buzzer:         enabled for snake/menu/status/splash/food/death/theme sounds
 ```
 
 Important hardware files:
 
-- [`config/boards/shields/sofle/sofle.dtsi`](config/boards/shields/sofle/sofle.dtsi) defines the shared matrix, transform, display-compatible node, sensors, and encoder nodes.
-- [`config/boards/shields/sofle/sofle_left_peripheral.overlay`](config/boards/shields/sofle/sofle_left_peripheral.overlay) enables the left-side columns and left encoder.
-- [`config/boards/shields/sofle/sofle_right.overlay`](config/boards/shields/sofle/sofle_right.overlay) applies the right-side column offset and enables the right encoder.
-- [`config/boards/shields/sofle/central_dongle.overlay`](config/boards/shields/sofle/central_dongle.overlay) gives the dongle a mock kscan and shared transform for central behavior.
+- [`config/boards/shields/sofle/sofle.dtsi`](config/boards/shields/sofle/sofle.dtsi): shared matrix, transform, sensors and encoders.
+- [`config/boards/shields/sofle/sofle_left_peripheral.overlay`](config/boards/shields/sofle/sofle_left_peripheral.overlay) and [`sofle_right.overlay`](config/boards/shields/sofle/sofle_right.overlay): each half's columns and encoder.
+- [`config/boards/shields/sofle/central_dongle.overlay`](config/boards/shields/sofle/central_dongle.overlay): the dongle's mock kscan and shared transform.
+- [`config/nexus_dongle.overlay`](config/nexus_dongle.overlay): NEXUS only - the physical layout ZMK Studio needs, and the second USB serial port for the HOST screen.
 
 ---
 
 ## Keymap
 
-The active keymap lives in [`config/sofle.keymap`](config/sofle.keymap). The shield-level keymap includes that file so the same layout is used by the custom shield.
-
-### Layer Overview
-
-This firmware has exactly these layers:
+The keymap lives in [`config/sofle.keymap`](config/sofle.keymap) and is shared by every build.
 
 ```text
-0 BASE       Typing, Windows shortcuts, Teams mute, app macro
-1 LOWER      Numbers, symbols, function keys
-2 RAISE      Bluetooth, output switching, arrows, pointer controls
-3 NAV_SNAKE  Snake game controls, anti-idle toggle, dongle action
+0 BASE    Typing, Windows shortcuts, Teams mute, app macro
+1 LOWER   Numbers, symbols, function keys
+2 RAISE   Bluetooth, output switching, arrows, pointer controls
+3 GAME    The dongle's controls (NEXUS), anti-idle
 ```
 
-There is no `ADJUST` layer in [`config/sofle.keymap`](config/sofle.keymap). Holding `LOWER` and `RAISE` together activates `NAV_SNAKE`, because the conditional layer is configured this way:
-
-```text
-if-layers = <LOWER RAISE>
-then-layer = <NAV_SNAKE>
-```
+There is no `ADJUST` layer. Holding `LOWER` and `RAISE` together turns on `GAME` (a conditional layer), and the `4 + 5` combo latches it.
 
 ### Base Layer Highlights
 
-- Windows app launch: number-row keys use `LG(N1)` through `LG(N5)` as mod-taps.
+- Windows app launch: number-row keys `1`-`5` are `Win+1`..`Win+5` on hold.
 - Multi app macro: `multi_win_apps` taps `Win+1` through `Win+5`.
-- Clipboard helpers: `Z`, `X`, `C`, and `V` use Ctrl mod-tap behavior.
-- Teams mic mute: `LC(LS(M))` appears on the base layer.
-- Tap-dance layers: `LOWER` and `RAISE` can be momentary on hold or toggled by double tap.
-- Encoder behavior: one encoder handles volume, the other handles vertical scroll.
+- Clipboard helpers: `Z`, `X`, `C` and `V` are Ctrl on hold.
+- Teams mic mute: `Ctrl+Shift+M` on the base layer.
+- Tap-dance layers: `LOWER` and `RAISE` are momentary on hold, toggled on double tap.
+- Encoders: left is volume, right is vertical scroll.
 
 ### Combos
 
@@ -167,161 +178,152 @@ then-layer = <NAV_SNAKE>
 | --- | --- | --- |
 | `J + K + L` | `BASE` | `Enter` |
 | `A + S + D` | `BASE` | `Ctrl+A` |
-| `4 + 5` | `BASE` and `NAV_SNAKE` | Toggle snake layer |
+| `4 + 5` | `BASE` and `GAME` | Toggle the GAME layer |
 
 ### Pointer Controls
 
-Pointer support is enabled with `CONFIG_ZMK_POINTING=y`.
-
-| Raise binding area | Action |
-| --- | --- |
-| Left click / right click / middle click | Mouse button actions |
-| Move up/down/left/right | Cursor movement |
-| Encoder scroll binding | Scroll up/down via `inc_dec_msc` |
-
-Mouse feel tuning:
+Pointer support is enabled with `CONFIG_ZMK_POINTING=y`. RAISE has left, right and middle click and cursor movement; the right encoder scrolls.
 
 - Move ramp: `time-to-max-speed-ms = 220`
-- Scroll ramp: `time-to-max-speed-ms = 200`
-- Scroll acceleration exponent: `0` for a linear feel
+- Scroll ramp: `time-to-max-speed-ms = 200`, linear (`acceleration-exponent = 0`)
 
 ---
 
-## Snake Layer
+## GAME Layer
 
-The snake layer is defined as `NAV_SNAKE` / layer `3` in [`config/sofle.keymap`](config/sofle.keymap). Its display name is `snake`.
+### On NEXUS
 
-### How To Enter Snake Layer
-
-- Hold `LOWER` and `RAISE` together.
-- Or press the `4 + 5` combo on the left number row to toggle snake mode.
-- Press `4 + 5` again while in snake mode to toggle it off.
-
-### What Snake Layer Does
-
-Most keys are intentionally disabled with `&none` so typing keys do not interfere with the game. Only the snake controls, dongle action key, anti-idle toggle, and a couple of layer toggles remain active.
+The NEXUS build replaces the whole layer (the `#ifdef NEXUS_DONGLE` block at the bottom of the keymap). The left hand drives the dongle's screens, the right hand plays.
 
 ```text
-Right half controls while NAV_SNAKE is active
-
-Top row:                         far-right key = dongle action
-Home-row cluster:                I / J / K / L = snake directions
-Thumbs:                          Lower and Raise toggles remain available
-
-Left half: A = anti-idle (mouse jiggler) toggle
+ LEFT = dongle UI                                RIGHT = the game
+ ,-------------------------------------.         ,-------------------------------------.
+ |Unlock| MENU | SAVE | HOST |   |     |         |   |   |      |   |   | PAUSE        |
+ | BACK | HOME | GAMES|  UP  |   |     |         |   |   |ROTATE|   |   |              |
+ |      |AntiI |      | DOWN |ENTER|   |         |   |LEFT| DOWN |RIGHT|  |              |
+ `-------------------------------------'         `-------------------------------------'
+                 | Lower | ENTER |                 | DROP | Raise |
 ```
+
+| Key | Action |
+| --- | --- |
+| `` ` `` | ZMK Studio unlock |
+| `1` / `2` / `3` | Settings menu / save settings now / HOST screen |
+| `Esc` / `Q` / `W` | Back / home dashboard / Game Center |
+| `E` / `D` / `F` | Up / down / enter (pick a row, or pause a game) |
+| `A` | Anti-idle on/off |
+| `I` / `J` `K` `L` | Rotate / left, soft drop, right |
+| `Del` | Pause, resume, restart, by context |
+| Left thumb `Enter` / right thumb `Space` | Enter / hard drop |
+| Left encoder / right encoder | Cycle the theme / volume |
+
+Everything else on the layer is `&none`, so nothing types into the host while you play.
+
+### On other builds
+
+Any firmware built without the NEXUS shield gets the fallback layer: `&none` everywhere except `A` (anti-idle) and the layer toggles on the thumbs. The Snake steering bindings (`&snake_dir`, `&dongle_action_behavior`) are no longer in this keymap - the Snake dongle's keyboard controls live on its own branch.
 
 ### Anti-Idle (Mouse Jiggler)
 
-Press `A` while in the snake layer to toggle anti-idle on or off. While on, the dongle sends humanized mouse micro-movements (random bursts of ±1–2 px moves with random 20–60 s pauses) so the host never goes idle, locks, or sleeps.
+Press `A` on the GAME layer to toggle anti-idle. While on, the dongle sends humanized mouse micro-movements (bursts of ±1-2 px with random 20-60 s pauses) so the host never idles, locks or sleeps.
 
-- Toggle on: the cursor gives a small twitch ~300 ms later as confirmation.
-- Status: a bright green dot appears in the top-right of the dongle status screen while active.
-- It keeps running after you leave the snake layer — return and press `A` again to stop.
-- Implemented by `&anti_idle` (`zmk,behavior-anti-idle`) from the snake module; only the dongle sends the movements, so the halves' battery life is unaffected.
-
-### Direction Keys
-
-The display is rotated, so the keymap compensates for the snake module direction numbers.
-
-```text
-I = visual Up
-J = visual Left
-K = visual Down
-L = visual Right
-```
-
-Actual ZMK bindings:
-
-```text
-I -> &snake_dir 1
-J -> &snake_dir 2
-K -> &snake_dir 3
-L -> &snake_dir 0
-```
-
-The top-right key on the snake layer calls `&dongle_action_behavior`, which is meant for dongle-side snake/menu action behavior from the snake adapter.
+- On: the cursor twitches once about 300 ms later as confirmation.
+- Status: a dot on the dongle screen while active (NEXUS shows it in the corner of the dashboard).
+- It keeps running after you leave the layer; press `A` again to stop.
+- Only the dongle sends the movements, so the halves' batteries are unaffected.
 
 ---
 
-## Snake And Display Experience
+## NEXUS Dongle
 
-The dongle config in [`config/boards/shields/sofle/central_dongle.conf`](config/boards/shields/sofle/central_dongle.conf) is the visual and game control center.
+Settings live in [`config/nexus_dongle.conf`](config/nexus_dongle.conf), applied on top of the shared `central_dongle.conf` and only to the NEXUS build. Full documentation: the [NEXUS repository](https://github.com/vaibhav8600-rgb/nexus) and its [`docs/`](https://github.com/vaibhav8600-rgb/nexus/tree/main/docs).
 
-### Enabled Display Features
+### What this build turns on
 
 ```text
-Display:          CONFIG_ZMK_DISPLAY=y
-Controller:       ST7789V, RGB565
-Rotation:         CONFIG_ROTATE_DISPLAY=90
-Splash:           config/custom_splash.c
-Splash time:      6000 ms
-Default screen:   status
-Info slot mode:   4-slot
-Visible slots:    empty, theme, connectivity, layer
-Battery fetching: central fetches both peripheral battery levels
+Name / brand:     NEXUS, "VAIBHAV TECH", "SMART ZMK DONGLE"
+Theme:            NEXUS (seven to choose from), animations on
+Display:          180 rotation; blanks 30 s + 870 s after the last key -
+                  15 minutes, the same moment the halves go to sleep
+Splash:           config/nexus/splash/splash.png, 240x240, 3.5 s
+Sound:            UI, game and startup sounds; split-half connect chirps
+Games:            all seven, high scores saved
+Button:           30 ms debounce, 600 ms long press
+Anti-idle dot:    on (from snake-module's &anti_idle)
+ZMK Studio:       on, over USB only (no BLE transport)
+HOST screen:      on (second USB serial port); goes stale after 5 s silent
+BLE link:         latency 0, 8 s supervision timeout - a plugged-in dongle
+Remote Input:     on; BT_MAX_CONN=8, BT_MAX_PAIRED=9 for the phones
+```
+
+### Phone remote (Remote Input)
+
+Use a phone as keyboard, trackpad, media remote and NEXUS controller - nothing installed on the computer, which just sees the same USB keyboard and mouse.
+
+1. On the dongle: **Settings > PHONE** opens a 60-second pairing window.
+2. Open the app - [nexus-remote-seven.vercel.app](https://nexus-remote-seven.vercel.app) - in **Bluefy** on iPhone (Safari has no Web Bluetooth) or Chrome on Android, and tap **Connect to NEXUS**.
+3. Type the six digits the dongle shows.
+
+After that, **Connect to NEXUS** brings the phone back with no code - also while a laptop is connected over BLE. Android pairing is still experimental. Details: [Remote Input](https://github.com/vaibhav8600-rgb/nexus/blob/main/docs/remote-input.md); app source: [nexus-remote](https://github.com/vaibhav8600-rgb/nexus-remote).
+
+### HOST screen
+
+A small companion on the PC sends the time, CPU and RAM load and what is playing over the dongle's second USB serial port. The dongle has no clock of its own, so this is also how the time gets onto the dashboard. Install it from the NEXUS repo's [`tools/nexus-host`](https://github.com/vaibhav8600-rgb/nexus/tree/main/tools/nexus-host) (`install.cmd` on Windows).
+
+### ZMK Studio
+
+Plug the dongle in over USB, open [ZMK Studio](https://zmk.studio), and press `` ` `` on the GAME layer to unlock.
+
+---
+
+## Snake Dongle
+
+The original firmware, built from [snake-module](https://github.com/vaibhav8600-rgb/snake-module). Its settings are in [`config/boards/shields/sofle/central_dongle.conf`](config/boards/shields/sofle/central_dongle.conf), which the NEXUS build also reads for the shared hardware (BLE, split, display bus) and then overrides.
+
+```text
+Display:          CONFIG_ZMK_DISPLAY=y, ST7789V RGB565, rotated 90
+Splash:           config/custom_splash.c, 6000 ms
+Default screen:   status, 4-slot info (theme, connectivity, layer)
+Battery fetching: central fetches both halves
 WPM thresholds:   20 / 40 / 80 / 90
-```
-
-### Snake Module Settings
-
-```text
-Board size:        L
-Snake fatness:     1
-Walk interval:     20 ms
-Checkered board:   enabled
-Theme threshold:   300 ms
-Mute threshold:    600 ms
-Logo interval:     40 ms
-```
-
-### Sound Settings
-
-The dongle enables buzzer support and sound feedback for splash, food, die, theme, menu, and status events.
-
-```text
-CONFIG_USE_BUZZER=y
-CONFIG_USE_SPLASH_SOUND=y
-CONFIG_USE_FOOD_SOUND=y
-CONFIG_USE_DIE_SOUND=y
-CONFIG_USE_THEME_SOUND=y
-CONFIG_USE_MENU_SOUND=y
-CONFIG_USE_STATUS_SOUND=y
+Snake:            board L, fatness 1, 20 ms walk, checkered board
+Sounds:           splash, food, die, theme, menu, status
 ```
 
 ---
 
 ## Flashing Guide
 
-### Option 1: GitHub Actions
+### GitHub Actions
 
-1. Push your changes to GitHub.
-2. Open the repository Actions tab.
-3. Run or wait for the `build.yml` workflow.
-4. Download the firmware artifacts.
-5. Flash each UF2 to the matching controller:
-   - `snake_dongle` to the dedicated dongle nice!nano.
-   - `sofle_left_peripheral` to the left half.
-   - `sofle_right` to the right half.
+1. Push your changes.
+2. Open the Actions tab and wait for (or run) `build.yml`.
+3. Download the firmware artifacts.
+4. Double-tap reset on each nice!nano and copy the matching UF2 onto it:
+   - `nexus_dongle` (or `snake_dongle`) to the dongle
+   - `sofle_left_peripheral` to the left half
+   - `sofle_right` to the right half
 
-### Option 2: Local ZMK Build
-
-Use this if your ZMK workspace is already set up locally.
+### Local ZMK build
 
 ```powershell
 west update
+west build -s zmk/app -d build/nexus_dongle -b "nice_nano@2.0.0//zmk" -S studio-rpc-usb-uart -- -DSHIELD="central_dongle nexus_dongle" -DZMK_CONFIG="$PWD/config"
 west build -s zmk/app -d build/snake_dongle -b "nice_nano@2.0.0//zmk" -- -DSHIELD="central_dongle snake_adapter" -DZMK_CONFIG="$PWD/config"
 west build -s zmk/app -d build/sofle_left -b "nice_nano@2.0.0//zmk" -- -DSHIELD="sofle_left_peripheral nice_view_adapter nice_view_gem" -DZMK_CONFIG="$PWD/config"
 west build -s zmk/app -d build/sofle_right -b "nice_nano@2.0.0//zmk" -- -DSHIELD="sofle_right nice_view_adapter nice_view_gem" -DZMK_CONFIG="$PWD/config"
 ```
 
-The project manifest is [`config/west.yml`](config/west.yml). It tracks:
+The manifest is [`config/west.yml`](config/west.yml):
 
 ```text
-ZMK:            zmkfirmware/zmk, revision main
-Snake module:   vaibhav8600-rgb/snake-module, revision improvements
-nice-view-gem:  M165437/nice-view-gem, revision main
+ZMK:            zmkfirmware/zmk, main
+NEXUS:          vaibhav8600-rgb/nexus, main
+Snake module:   vaibhav8600-rgb/snake-module, improvements   (every build: the keymap uses &anti_idle)
+nice-view-gem:  M165437/nice-view-gem, main
 ```
+
+All four follow branches, so a build always takes their newest commits. If a build breaks after nothing changed here, one of them moved - the NEXUS repo's CI badge is the first thing to check.
 
 ---
 
@@ -330,22 +332,19 @@ nice-view-gem:  M165437/nice-view-gem, revision main
 For a clean bring-up:
 
 1. Flash `settings_reset` to the dongle and both halves if they have stale pairings.
-2. Flash `snake_dongle` to the dongle.
-3. Flash `sofle_left_peripheral` to the left half.
-4. Flash `sofle_right` to the right half.
-5. Power the dongle first, then power the halves.
-6. Use the Raise layer Bluetooth controls to select or clear host profiles.
+2. Flash `nexus_dongle` (or `snake_dongle`) to the dongle.
+3. Flash `sofle_left_peripheral` and `sofle_right` to the halves.
+4. Power the dongle first, then the halves.
+5. Pair hosts with the RAISE layer Bluetooth keys.
 
-Useful Raise layer controls:
-
-| Binding | Purpose |
+| Binding (RAISE) | Purpose |
 | --- | --- |
 | `BT_SEL 0` to `BT_SEL 4` | Select host profile 1-5 |
 | `BT_CLR` | Clear current profile |
-| `BT_CLR_ALL` | Clear all stored profiles |
-| `OUT_USB` | Force USB output |
-| `OUT_BLE` | Force BLE output |
-| `OUT_TOG` | Toggle output |
+| `BT_CLR_ALL` | Clear all stored profiles (phones paired with NEXUS too) |
+| `OUT_USB` / `OUT_BLE` / `OUT_TOG` | Force USB, force BLE, toggle |
+
+Switching between the two dongle firmwares: flash `settings_reset` to the dongle in between, so neither inherits the other's settings.
 
 ---
 
@@ -357,18 +356,17 @@ Useful Raise layer controls:
 |-- build.yaml
 |-- .github/workflows/build.yml
 |-- images/
-|   |-- 1770889269846.jfif
-|   |-- 1770889270673.jfif
-|   |-- produuct img.jpeg
-|   `-- wiring.webp
 `-- config/
     |-- west.yml
-    |-- sofle.conf
-    |-- sofle.keymap
+    |-- sofle.conf                  halves and shared keyboard options
+    |-- sofle.keymap                shared keymap, NEXUS GAME layer at the bottom
+    |-- nexus_dongle.conf           NEXUS settings
+    |-- nexus_dongle.overlay        Studio layout, HOST serial port
+    |-- nexus/splash/               NEXUS splash image and how to change it
+    |-- custom_splash.c             Snake splash
     |-- info.json
-    |-- custom_splash.c
     `-- boards/shields/sofle/
-        |-- central_dongle.conf
+        |-- central_dongle.conf     shared dongle hardware + Snake settings
         |-- central_dongle.overlay
         |-- sofle.dtsi
         |-- sofle_left_peripheral.overlay
@@ -384,49 +382,35 @@ Useful Raise layer controls:
 
 ## Customization Guide
 
-- Change keys, layers, combos, macros:
-  [`config/sofle.keymap`](config/sofle.keymap), look for `keymap`, `combos`, `macros`, and `behaviors`.
-- Rename keyboard:
-  [`config/sofle.conf`](config/sofle.conf) and [`central_dongle.conf`](config/boards/shields/sofle/central_dongle.conf), look for `CONFIG_ZMK_KEYBOARD_NAME`.
-- Tune snake gameplay:
-  [`central_dongle.conf`](config/boards/shields/sofle/central_dongle.conf), look for `CONFIG_SNAKE_*`.
-- Change display theme:
-  [`central_dongle.conf`](config/boards/shields/sofle/central_dongle.conf), look for `CONFIG_*_COLOR`.
-- Change splash art:
-  [`config/custom_splash.c`](config/custom_splash.c), look for `custom_splash_map`, width, and height.
-- Adjust display slots:
-  [`central_dongle.conf`](config/boards/shields/sofle/central_dongle.conf), look for `CONFIG_INFO_SLOT_*`.
-- Tune pointer movement:
-  [`config/sofle.keymap`](config/sofle.keymap), look for `&mmv` and `&msc`.
-- Tune encoders:
-  [`config/sofle.keymap`](config/sofle.keymap) and [`sofle.dtsi`](config/boards/shields/sofle/sofle.dtsi), look for `sensor-bindings`, `triggers-per-rotation`, and `steps`.
-- Change build outputs:
-  [`build.yaml`](build.yaml), look for the `include` matrix.
-- Update module revisions:
-  [`config/west.yml`](config/west.yml), look for `projects`.
+| To change | Where |
+| --- | --- |
+| Keys, layers, combos, macros | [`config/sofle.keymap`](config/sofle.keymap) |
+| The NEXUS GAME layer | the `#ifdef NEXUS_DONGLE` block at the bottom of the keymap |
+| NEXUS theme, splash, sounds, games, blanking time | [`config/nexus_dongle.conf`](config/nexus_dongle.conf) |
+| NEXUS splash image | [`config/nexus/splash/`](config/nexus/splash/README.md) (PNG, up to 240x240) |
+| Turn phone control off | `CONFIG_NEXUS_REMOTE_INPUT=n` in `nexus_dongle.conf` (drop the two `BT_MAX_*` lines too) |
+| Snake gameplay, colours, slots | [`central_dongle.conf`](config/boards/shields/sofle/central_dongle.conf): `CONFIG_SNAKE_*`, `CONFIG_*_COLOR`, `CONFIG_INFO_SLOT_*` |
+| Snake splash | [`config/custom_splash.c`](config/custom_splash.c) |
+| Keyboard name | `CONFIG_ZMK_KEYBOARD_NAME` in `sofle.conf`, `central_dongle.conf` (Snake) or `nexus_dongle.conf` (NEXUS) |
+| Pointer and encoder feel | `&mmv`, `&msc` and `sensor-bindings` in the keymap; `sofle.dtsi` for encoder steps |
+| Build outputs | [`build.yaml`](build.yaml) |
+| Module revisions | [`config/west.yml`](config/west.yml) |
 
 ---
 
 ## Troubleshooting
 
-- Halves do not connect to dongle:
-  flash `settings_reset` to all controllers, then reflash dongle first and halves second.
-- Wrong half sends wrong columns:
-  confirm the left half uses `sofle_left_peripheral` and the right half uses `sofle_right`.
-- Bluetooth host will not pair:
-  use Raise layer `BT_CLR` or `BT_CLR_ALL`, then pair again from the host.
-- Display is rotated incorrectly:
-  check `CONFIG_ROTATE_DISPLAY=90` in `central_dongle.conf`.
-- Snake controls feel rotated:
-  this is expected because the keymap compensates for the 90-degree display orientation.
-- Encoders do nothing:
-  confirm the correct half firmware is flashed and EC11 support is enabled in `config/sofle.conf`.
-- Mouse keys do nothing:
-  confirm `CONFIG_ZMK_POINTING=y` remains enabled.
-- Anti-idle does not move the cursor:
-  confirm `CONFIG_ZMK_POINTING=y` is enabled for the dongle build and that the green indicator square is showing on the dongle status screen (press `A` in the snake layer to toggle).
-- Build cannot find snake symbols:
-  confirm `snake-module` is present from `config/west.yml` and the dongle shield stack includes `snake_adapter`.
+- **Halves do not connect to the dongle:** flash `settings_reset` to all three, then the dongle firmware first and the halves second.
+- **Wrong half sends wrong columns:** the left half takes `sofle_left_peripheral`, the right `sofle_right`.
+- **A Bluetooth host will not pair:** RAISE `BT_CLR` (or `BT_CLR_ALL`), then pair again from the host.
+- **Anything else on NEXUS** - display, sound, split, Studio, HOST: the NEXUS repo's [troubleshooting](https://github.com/vaibhav8600-rgb/nexus/blob/main/docs/troubleshooting.md).
+- **The phone will not pair with NEXUS:** forget NEXUS in the phone's Bluetooth settings first, then Settings > PHONE on the dongle and Connect within the minute.
+- **The NEXUS app cannot find the dongle:** on iPhone, use Bluefy, not Safari. A phone that has never paired needs Settings > PHONE first.
+- **HOST screen says NO LINK:** the PC companion is not running - see [HOST screen](#host-screen).
+- **The NEXUS dashboard blanks while you are still around:** blanking counts from the last key on either half; raise `CONFIG_NEXUS_BACKLIGHT_TIMEOUT_S`.
+- **Encoders do nothing:** check the right half firmware is flashed and EC11 is enabled in `config/sofle.conf`.
+- **Mouse keys or anti-idle do nothing:** `CONFIG_ZMK_POINTING=y` must stay enabled; anti-idle shows its dot on the dongle when on.
+- **Build cannot find snake or anti-idle symbols:** `snake-module` must stay in `config/west.yml` - every build needs it, because the keymap uses `&anti_idle`.
 
 ---
 
@@ -446,5 +430,6 @@ This configuration builds on:
 - [Sofle Keyboard](https://github.com/josefadamcik/SofleKeyboard)
 - [`nice-view-gem`](https://github.com/M165437/nice-view-gem)
 - [joaopedropio](https://github.com/joaopedropio), who created the initial dongle foundation used as the base for this project.
-- [vaibhav8600-rgb/snake-module](https://github.com/vaibhav8600-rgb/snake-module), enhanced here with multiple features including playable snake gameplay on the dongle, custom splash screen support, display theming, sounds, and status/game UI improvements.
+- [vaibhav8600-rgb/snake-module](https://github.com/vaibhav8600-rgb/snake-module): the Snake dongle - playable snake, custom splash, display theming, sounds and status UI - and the anti-idle behavior both dongles use.
+- [vaibhav8600-rgb/nexus](https://github.com/vaibhav8600-rgb/nexus): the NEXUS smart dongle, and [nexus-remote](https://github.com/vaibhav8600-rgb/nexus-remote), its phone app.
 - [felixJR123](https://github.com/felixJR123), credited for the 3D-print case design.
