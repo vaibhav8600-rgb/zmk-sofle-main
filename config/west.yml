@@ -37,8 +37,6 @@ manifest:
     # keyboard - check it before bumping anything.
     - name: nexus
       remote: vaibhav8600-rgb
-      # main is what you flash. To try a NEXUS branch first, point this at it
-      # on a test branch of this repo, and back to main once it is merged.
       revision: main
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
