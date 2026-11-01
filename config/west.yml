@@ -37,7 +37,8 @@ manifest:
     # keyboard - check it before bumping anything.
     - name: nexus
       remote: vaibhav8600-rgb
-      revision: main
+      # TESTING Buddy: back to main once feature/buddy is merged there.
+      revision: feature/buddy
     - name: nice-view-gem #new entry
       remote: m165437 #new entry
       revision: main #new entry
