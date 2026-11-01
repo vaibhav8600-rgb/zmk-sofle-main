@@ -49,7 +49,7 @@ The same dongle hardware runs either firmware. Flash **one** of them; the halves
 | Screen | Dashboard: links, layer, modifiers, WPM, both batteries | Snake game and status slots |
 | Games | Tetris, Snake, Breakout, Pac-Man, Jumper, Invaders, Pong, from a Game Center | Snake |
 | Controls | Dongle button plus the GAME layer | Dongle screen and menu (no keyboard steering in this keymap) |
-| Extras | Themes, custom splash, HOST screen (PC clock and stats), ZMK Studio over USB, phone remote | Splash art, themes, sounds |
+| Extras | Themes, custom splash, HOST screen (PC clock and stats), Buddy (an animated face you can chat with), ZMK Studio over USB, phone remote | Splash art, themes, sounds |
 | Bluetooth name | `NEXUS` | `Snake` |
 
 <p align="center">
@@ -198,7 +198,7 @@ The NEXUS build replaces the whole layer (the `#ifdef NEXUS_DONGLE` block at the
 ```text
  LEFT = dongle UI                                RIGHT = the game
  ,-------------------------------------.         ,-------------------------------------.
- |Unlock| MENU | SAVE | HOST |   |     |         |   |   |      |   |   | PAUSE        |
+ |Unlock| MENU | SAVE | HOST |BUDDY|    |         |   |   |      |   |   | PAUSE        |
  | BACK | HOME | GAMES|  UP  |   |     |         |   |   |ROTATE|   |   |              |
  |      |AntiI |      | DOWN |ENTER|   |         |   |LEFT| DOWN |RIGHT|  |              |
  `-------------------------------------'         `-------------------------------------'
@@ -209,6 +209,7 @@ The NEXUS build replaces the whole layer (the `#ifdef NEXUS_DONGLE` block at the
 | --- | --- |
 | `` ` `` | ZMK Studio unlock |
 | `1` / `2` / `3` | Settings menu / save settings now / HOST screen |
+| `4` | Buddy's face; press again to go back |
 | `Esc` / `Q` / `W` | Back / home dashboard / Game Center |
 | `E` / `D` / `F` | Up / down / enter (pick a row, or pause a game) |
 | `A` | Anti-idle on/off |
@@ -245,7 +246,8 @@ Name / brand:     NEXUS, "VAIBHAV TECH", "SMART ZMK DONGLE"
 Theme:            NEXUS (seven to choose from), animations on
 Display:          180 rotation; blanks 30 s + 870 s after the last key -
                   15 minutes, the same moment the halves go to sleep
-Splash:           config/nexus/splash/splash.png, 240x240, 3.5 s
+Splash:           config/nexus/splash/splash.png, shown at 216x216, 3.5 s
+                  (240 does not fit this dongle's old bootloader with Buddy)
 Sound:            UI, game and startup sounds; split-half connect chirps
 Games:            all seven, high scores saved
 Button:           30 ms debounce, 600 ms long press
@@ -254,6 +256,7 @@ ZMK Studio:       on, over USB only (no BLE transport)
 HOST screen:      on (second USB serial port); goes stale after 5 s silent
 BLE link:         latency 0, 8 s supervision timeout - a plugged-in dongle
 Remote Input:     on; BT_MAX_CONN=8, BT_MAX_PAIRED=9 for the phones
+Buddy:            on, owner VAIBHAV; GAME layer 4 opens the face
 ```
 
 ### Phone remote (Remote Input)
