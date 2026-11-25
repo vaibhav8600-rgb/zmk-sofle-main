@@ -54,6 +54,18 @@
         bindings = <&mo RAISE>, <&tog RAISE>;
     };
 
+    // ---------- BUDDY TALK ON HOLD (Z and /) ----------
+    // Tap-preferred, not &mt's hold-preferred: only a real hold sends the
+    // hotkey, so a fast roll like "/u" in a URL never starts Buddy talking.
+    buddy_ht: buddy_ht {
+        compatible = "zmk,behavior-hold-tap";
+        #binding-cells = <2>;
+        flavor = "tap-preferred";
+        tapping-term-ms = <300>;
+        quick-tap-ms = <200>;      // tap then hold = repeat the letter
+        bindings = <&kp>, <&kp>;
+    };
+
     /* Activate the GAME layer when LOWER and RAISE are both held. */
     conditional_layers {
         compatible = "zmk,conditional-layers";
@@ -146,19 +158,21 @@
              * | ` Caps | Win1 | Win2 | Win3 | Win4 | Win5     |   |  6   |  7   |  8   |  9   |  0   | Del      |
              * | Esc    |  Q   |  W   |  E   |  R   |  T       |   | C-Y  |  U   |  I   |  O   |  P   | Bksp     |
              * | Tab    |  A   |  S   |  D   |  F   |  G       |   |  H   |  J   |  K   |  L   |  ;   | '        |
-             * | Shift  | C-Z  | C-X  | C-C  | C-V  |  B |Teams|   | Apps |  N   |  M   |  ,   |  .   |  / |Shift|
+             * | Shift  | Z*   | C-X  | C-C  | C-V  |  B |Teams|   | Apps |  N   |  M   |  ,   |  .   | /* |Shift|
              * `-----------------------------+------+-------'   `------+-------+-----------------------------'
              *            | Gui  | Alt  | Ctrl | Lower | Enter |   | Space | Raise | Ctrl | Alt  | Gui |
              *            `------------------------------------'   `-----------------------------------'
              *
              * Encoder pushes: left = Teams mic mute, right = multi app macro.
              * Combos: A+S+D = Ctrl+A, J+K+L = Enter, 4+5 = Snake layer toggle.
+             * Z* and /*: hold = Buddy talk / stop (Ctrl+Alt+Shift+N, the NEXUS
+             * voice window's hotkey), one on each half. Tap types as usual.
              */
             bindings = <
 &mt CLCK GRAVE &mt LG(N1) N1  &mt LG(N2) N2  &mt LG(N3) N3  &mt LG(N4) N4  &mt LG(N5) N5                                        &kp N6       &kp N7    &kp N8             &kp N9    &kp N0   &kp DEL
 &kp ESC        &kp Q          &kp W          &kp E          &kp R          &kp T                                                &mt LC(Y) Y  &kp U     &kp I              &kp O     &kp P    &kp BSPC
 &kp TAB        &kp A          &kp S          &kp D          &kp F          &kp G                                                &kp H        &kp J     &kp K              &kp L     &kp SEMI &kp SQT
-&kp LSHFT      &mt LC(Z) Z    &mt LC(X) X    &mt LC(C) C    &mt LC(V) V    &kp B      &kp LC(LS(M))             &multi_win_apps &kp N        &kp M     &kp COMMA          &kp DOT  &kp FSLH &kp RSHFT
+&kp LSHFT      &buddy_ht LC(LA(LS(N))) Z &mt LC(X) X &mt LC(C) C &mt LC(V) V &kp B &kp LC(LS(M))      &multi_win_apps &kp N        &kp M     &kp COMMA          &kp DOT  &buddy_ht LC(LA(LS(N))) FSLH &kp RSHFT
                               &kp LGUI       &kp LALT       &kp LCTRL      &tap_dance_lower  &kp RET            &kp SPACE   &tap_dance_raise &kp RCTRL &kp RALT           &kp RGUI
             >;
 
