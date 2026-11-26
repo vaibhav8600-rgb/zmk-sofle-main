@@ -54,7 +54,7 @@
         bindings = <&mo RAISE>, <&tog RAISE>;
     };
 
-    // ---------- BUDDY TALK ON HOLD (Z and /) ----------
+    // ---------- BUDDY ON HOLD: Z what's this?, / dictate ----------
     // Tap-preferred, not &mt's hold-preferred: only a real hold sends the
     // hotkey, so a fast roll like "/u" in a URL never starts Buddy talking.
     buddy_ht: buddy_ht {
@@ -165,14 +165,18 @@
              *
              * Encoder pushes: left = Teams mic mute, right = multi app macro.
              * Combos: A+S+D = Ctrl+A, J+K+L = Enter, 4+5 = Snake layer toggle.
-             * Z* and /*: hold = Buddy talk / stop (Ctrl+Alt+Shift+N, the NEXUS
-             * voice window's hotkey), one on each half. Tap types as usual.
+             * Z* and /*: hold and talk, then let go (the NEXUS voice window):
+             *   Z* hold = "what's this?" about the selection (Ctrl+Alt+Shift+E) -
+             *        the left hand, free while the right one selects
+             *   /* hold = dictate anywhere (Ctrl+Alt+Shift+D)
+             * Tap types as usual. Talk on and off: Ctrl+Alt+Shift+N, or the
+             * window's button.
              */
             bindings = <
 &mt CLCK GRAVE &mt LG(N1) N1  &mt LG(N2) N2  &mt LG(N3) N3  &mt LG(N4) N4  &mt LG(N5) N5                                        &kp N6       &kp N7    &kp N8             &kp N9    &kp N0   &kp DEL
 &kp ESC        &kp Q          &kp W          &kp E          &kp R          &kp T                                                &mt LC(Y) Y  &kp U     &kp I              &kp O     &kp P    &kp BSPC
 &kp TAB        &kp A          &kp S          &kp D          &kp F          &kp G                                                &kp H        &kp J     &kp K              &kp L     &kp SEMI &kp SQT
-&kp LSHFT      &buddy_ht LC(LA(LS(N))) Z &mt LC(X) X &mt LC(C) C &mt LC(V) V &kp B &kp LC(LS(M))      &multi_win_apps &kp N        &kp M     &kp COMMA          &kp DOT  &buddy_ht LC(LA(LS(N))) FSLH &kp RSHFT
+&kp LSHFT      &buddy_ht LC(LA(LS(E))) Z &mt LC(X) X &mt LC(C) C &mt LC(V) V &kp B &kp LC(LS(M))      &multi_win_apps &kp N        &kp M     &kp COMMA          &kp DOT  &buddy_ht LC(LA(LS(D))) FSLH &kp RSHFT
                               &kp LGUI       &kp LALT       &kp LCTRL      &tap_dance_lower  &kp RET            &kp SPACE   &tap_dance_raise &kp RCTRL &kp RALT           &kp RGUI
             >;
 
